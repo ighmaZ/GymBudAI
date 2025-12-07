@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+
+  id String @id @default(cuid())
+  email String @unique
+  name String?
+  createdAt DateTime @default(now())
+  dailyCaloriesGoal Int @default(2000)
+  meals Meal[] 
+}
+
+model Meal {
+
+  id String @id @default(cuid())
+  userId String
+  name String
+  imageUrl String?
+  totalCalories Int @default(0)
+  totalProtein Int @default(0)
+  totalCarbs Int @default(0)
+  totalFat Int @default(0)
+  createdAt DateTime @default(now())
+  food FoodItem[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+}
+
+model FoodItem {
+
+  id String @id @default(cuid())
+  mealId String
+  name String
+  portion String
+  calories Int 
+  protein Int @default(0)
+  carbs Int @default(0)
+  fat Int @default(0)
+  confidence Float @default(0.8)
+  createdAt DateTime @default(now())
+
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+}
+
+
