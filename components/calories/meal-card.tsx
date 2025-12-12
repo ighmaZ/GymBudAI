@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -34,75 +34,68 @@ export function MealCard({
   imageUrl,
   totalCalories,
   totalProtein,
-  totalCarbs,
-  totalFat,
   createdAt,
   food,
   onClick,
 }: MealCardProps) {
-  const mealEmoji =
-    {
-      Breakfast: "🍳",
-      Lunch: "🥗",
-      Dinner: "🍽️",
-      Snack: "🍎",
-    }[name] || "🍴";
+  const mealEmoji = {
+    Breakfast: "🍳",
+    Lunch: "🥗",
+    Dinner: "🍽️",
+    Snack: "🍎",
+  }[name] || "🍴";
 
   const time = format(new Date(createdAt), "h:mm a");
 
   return (
     <motion.div
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={cn(
-        "p-4 rounded-2xl bg-gray-50",
-        "flex items-center gap-4",
-        "border border-transparent hover:border-gray-200",
-        "cursor-pointer transition-all"
+        "group p-4 rounded-3xl bg-white border border-gray-100",
+        "flex items-center gap-5 cursor-pointer",
+        "hover:border-gray-200 hover:shadow-xl hover:shadow-gray-100/50",
+        "transition-all duration-300"
       )}
     >
       {/* Image or Emoji */}
-      <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0">
+      <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0 relative">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={name}
-            width={64}
-            height={64}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-2xl">
+          <div className="w-full h-full flex items-center justify-center text-3xl">
             {mealEmoji}
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <h4 className="font-bold font-oswald uppercase">{name}</h4>
-          <span className="text-xs text-gray-400 flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {time}
-          </span>
+      <div className="flex-1 min-w-0 py-1">
+        <div className="flex justify-between items-start mb-1">
+          <div>
+            <h4 className="font-bold font-oswald uppercase text-lg leading-none mb-1">{name}</h4>
+            <p className="text-xs font-medium text-gray-400">{time}</p>
+          </div>
+          <div className="text-right">
+            <span className="text-lg font-bold block leading-none">{totalCalories}</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">kcal</span>
+          </div>
         </div>
-        <p className="text-sm text-gray-500 truncate">
+        
+        <p className="text-sm text-gray-500 truncate font-medium">
           {food.map((f) => f.name).join(", ")}
         </p>
-        <p className="text-xs text-gray-400 mt-1">
-          P: {totalProtein}g • C: {totalCarbs}g • F: {totalFat}g
-        </p>
       </div>
 
-      {/* Calories */}
-      <div className="text-right flex-shrink-0">
-        <p className="text-xl font-bold">{totalCalories}</p>
-        <p className="text-xs text-gray-400">kcal</p>
+      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-black group-hover:text-white transition-colors duration-300">
+        <ChevronRight className="w-4 h-4" />
       </div>
-
-      <ChevronRight className="w-5 h-5 text-gray-300 flex-shrink-0" />
     </motion.div>
   );
 }

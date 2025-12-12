@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { fadeInUp } from "@/lib/animations";
 import type { Feature } from "@/types";
+import Link from "next/link";
 
 interface FeatureCardProps extends Feature {
   index: number;
   className?: string;
+  href?: string;
 }
 
 export function FeatureCard({
@@ -16,8 +18,9 @@ export function FeatureCard({
   description,
   index,
   className,
+  href,
 }: FeatureCardProps) {
-  return (
+  const CardContent = (
     <motion.div
       variants={fadeInUp}
       initial="hidden"
@@ -43,5 +46,10 @@ export function FeatureCard({
       <p className="text-gray-600 leading-relaxed">{description}</p>
     </motion.div>
   );
-}
 
+  if (href) {
+    return <Link href={href}>{CardContent}</Link>;
+  }
+
+  return CardContent;
+}

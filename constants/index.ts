@@ -8,12 +8,13 @@ export const NAV_LINKS: NavLink[] = [
   { label: "Contacts", href: "#contacts" },
 ];
 
-export const FEATURES: Feature[] = [
+export const FEATURES: (Feature & { href?: string })[] = [
   {
     icon: Activity,
     title: "Count Calories",
     description:
       "Track your daily intake with precision using our advanced AI food recognition system.",
+    href: "/calories",
   },
   {
     icon: Camera,
@@ -39,4 +40,3 @@ export const SITE_CONFIG = {
     "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop",
   videoDuration: "3 min",
 } as const;
-

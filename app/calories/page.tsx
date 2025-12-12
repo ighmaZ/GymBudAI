@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Plus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowLeft,
+  Plus,
+  ChevronRight,
+  Utensils,
+  Flame,
+  Camera,
+} from "lucide-react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -35,7 +43,6 @@ interface MealData {
   }[];
 }
 
-// For now, use a mock user ID (you'll replace with real auth later)
 const MOCK_USER_ID = "demo-user-123";
 const DAILY_GOAL = 2000;
 
@@ -48,8 +55,9 @@ export default function CaloriesPage() {
 
   const { isAnalyzing, setIsAnalyzing } = useCalorieStore();
 
-  // Fetch today's meals
   const today = format(new Date(), "yyyy-MM-dd");
+  const displayDate = format(new Date(), "EEEE, MMM d");
+
   const { data: meals = [], isLoading: mealsLoading } = useQuery({
     queryKey: ["meals", MOCK_USER_ID, today],
     queryFn: async () => {
@@ -61,7 +69,6 @@ export default function CaloriesPage() {
     },
   });
 
-  // Calculate daily totals
   interface DailyTotals {
     calories: number;
     protein: number;
@@ -79,7 +86,6 @@ export default function CaloriesPage() {
     { calories: 0, protein: 0, carbs: 0, fat: 0 }
   );
 
-  // Analyze food mutation
   const analyzeMutation = useMutation({
     mutationFn: async (imageBase64: string) => {
       const res = await fetch("/api/analyze-food", {
@@ -100,7 +106,6 @@ export default function CaloriesPage() {
     },
   });
 
-  // Save meal mutation
   const saveMealMutation = useMutation({
     mutationFn: async () => {
       if (!analysisResult) return;
@@ -111,7 +116,7 @@ export default function CaloriesPage() {
         body: JSON.stringify({
           userId: MOCK_USER_ID,
           name: analysisResult.mealSuggestion,
-          imageUrl: null, // We'll add image upload later
+          imageUrl: null,
           foods: analysisResult.foods,
         }),
       });
@@ -126,112 +131,221 @@ export default function CaloriesPage() {
     },
   });
 
-  // Handle image selection
   const handleImageSelect = (base64: string) => {
     setCurrentImageBase64(base64);
     setIsAnalyzing(true);
     analyzeMutation.mutate(base64);
   };
 
-  // Handle cancel
   const handleCancel = () => {
     setAnalysisResult(null);
     setCurrentImageBase64(null);
     setShowUpload(false);
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+        <div className="max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href="/"
-            className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 -ml-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-full transition-all"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-xl font-bold font-oswald uppercase">
-            Count Calories
+          <h1 className="text-lg font-bold font-oswald uppercase tracking-wide">
+            {showUpload ? "Add Meal" : "Dashboard"}
           </h1>
-          <div className="w-10" /> {/* Spacer */}
+          <div className="w-9" />
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-6 space-y-8">
-        {/* Show upload or results */}
-        {showUpload ? (
-          <div className="space-y-6">
-            {!analysisResult ? (
-              <ImageUpload
-                onImageSelect={handleImageSelect}
-                isLoading={isAnalyzing}
-              />
-            ) : (
-              <FoodResults
-                foods={analysisResult.foods}
-                mealSuggestion={analysisResult.mealSuggestion}
-                total={analysisResult.total}
-                onConfirm={() => saveMealMutation.mutate()}
-                onCancel={handleCancel}
-                isLoading={saveMealMutation.isPending}
-              />
-            )}
-          </div>
-        ) : (
-          <>
-            {/* Daily Progress */}
-            <section className="text-center">
-              <p className="text-sm text-gray-500 mb-4">
-                {format(new Date(), "EEEE, MMMM d")}
-              </p>
-              <CalorieRing
-                consumed={dailyTotals.calories}
-                goal={DAILY_GOAL}
-                className="mx-auto"
-              />
-              <p className="mt-4 text-sm text-gray-500">
-                Goal: <span className="font-medium">{DAILY_GOAL} kcal</span>
-              </p>
-            </section>
-
-            {/* Add Meal Button */}
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full"
-              onClick={() => setShowUpload(true)}
+      <main className="max-w-xl mx-auto px-6 py-8 pb-32">
+        <AnimatePresence mode="wait">
+          {showUpload ? (
+            <motion.div
+              key="upload"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-8"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Meal
-            </Button>
-
-            {/* Today's Meals */}
-            <section>
-              <h2 className="text-lg font-bold font-oswald uppercase mb-4">
-                Today&apos;s Meals
-              </h2>
-
-              {mealsLoading ? (
-                <div className="text-center py-8 text-gray-400">Loading...</div>
-              ) : meals.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  <p>No meals logged yet today.</p>
-                  <p className="text-sm mt-1">
-                    Tap &quot;Add Meal&quot; to get started!
-                  </p>
+              {!analysisResult ? (
+                <div className="space-y-6">
+                  <div className="text-center space-y-2">
+                    <h2 className="text-3xl font-bold font-oswald uppercase tracking-tight">
+                      Snap Your Meal
+                    </h2>
+                    <p className="text-gray-500 font-medium">
+                      Upload a photo to track calories instantly
+                    </p>
+                  </div>
+                  <ImageUpload
+                    onImageSelect={handleImageSelect}
+                    isLoading={isAnalyzing}
+                  />
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowUpload(false)}
+                    className="w-full text-gray-500 hover:text-black hover:bg-gray-50 uppercase tracking-wide font-bold"
+                  >
+                    Cancel
+                  </Button>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {(meals as MealData[]).map((meal) => (
-                    <MealCard key={meal.id} {...meal} />
-                  ))}
-                </div>
+                <FoodResults
+                  foods={analysisResult.foods}
+                  mealSuggestion={analysisResult.mealSuggestion}
+                  total={analysisResult.total}
+                  onConfirm={() => saveMealMutation.mutate()}
+                  onCancel={handleCancel}
+                  isLoading={saveMealMutation.isPending}
+                />
               )}
-            </section>
-          </>
-        )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="dashboard"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="space-y-10"
+            >
+              {/* Daily Progress Card */}
+              <motion.section variants={itemVariants}>
+                <div className="bg-gray-50 rounded-[2.5rem] p-8 relative overflow-hidden group hover:bg-gray-100 transition-colors duration-500">
+                  <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                    <Flame className="w-32 h-32" />
+                  </div>
+
+                  <div className="relative z-10 flex flex-col items-center">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-8">
+                      {displayDate}
+                    </span>
+
+                    <CalorieRing
+                      consumed={dailyTotals.calories}
+                      goal={DAILY_GOAL}
+                      size={220}
+                      strokeWidth={12}
+                      className="mb-8"
+                    />
+
+                    <div className="grid grid-cols-3 gap-8 w-full max-w-xs mt-2">
+                      <div className="text-center group/stat">
+                        <p className="text-2xl font-bold text-black group-hover/stat:scale-110 transition-transform">
+                          {dailyTotals.protein}g
+                        </p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                          Protein
+                        </p>
+                      </div>
+                      <div className="text-center border-x border-gray-200 group/stat">
+                        <p className="text-2xl font-bold text-black group-hover/stat:scale-110 transition-transform">
+                          {dailyTotals.carbs}g
+                        </p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                          Carbs
+                        </p>
+                      </div>
+                      <div className="text-center group/stat">
+                        <p className="text-2xl font-bold text-black group-hover/stat:scale-110 transition-transform">
+                          {dailyTotals.fat}g
+                        </p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                          Fat
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.section>
+
+              {/* Action Bar */}
+              <motion.div
+                variants={itemVariants}
+                className="flex items-center justify-between px-2"
+              >
+                <h2 className="text-2xl font-bold font-oswald uppercase tracking-tight flex items-center gap-3">
+                  <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center">
+                    <Utensils className="w-4 h-4" />
+                  </div>
+                  Today&apos;s Logs
+                </h2>
+                <Link
+                  href="#"
+                  className="text-xs font-bold text-gray-400 hover:text-black uppercase tracking-wider transition-colors flex items-center gap-1 group"
+                >
+                  View History{" "}
+                  <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </motion.div>
+
+              {/* Meals List */}
+              <motion.section variants={itemVariants} className="space-y-4">
+                {mealsLoading ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-gray-300 space-y-4">
+                    <div className="w-8 h-8 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
+                    <p className="text-xs font-bold uppercase tracking-widest">
+                      Loading meals...
+                    </p>
+                  </div>
+                ) : meals.length === 0 ? (
+                  <div className="text-center py-16 px-6 rounded-[2.5rem] bg-gray-50 border-2 border-dashed border-gray-100">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300 shadow-sm">
+                      <Utensils className="w-6 h-6" />
+                    </div>
+                    <p className="font-bold text-lg text-black uppercase font-oswald tracking-wide">
+                      No meals logged yet
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2 font-medium">
+                      Start tracking your nutrition today!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {(meals as MealData[]).map((meal) => (
+                      <MealCard key={meal.id} {...meal} />
+                    ))}
+                  </div>
+                )}
+              </motion.section>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
+
+      {!showUpload && (
+        <motion.div
+          initial={{ scale: 0, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40"
+        >
+          <Button
+            size="lg"
+            className="h-16 px-8 rounded-full shadow-2xl shadow-black/20 bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all duration-300 border-4 border-white flex items-center gap-3"
+            onClick={() => setShowUpload(true)}
+          >
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <Camera className="w-4 h-4" />
+            </div>
+            <span className="font-bold font-oswald uppercase tracking-wider text-lg">
+              Snap Meal
+            </span>
+          </Button>
+        </motion.div>
+      )}
     </div>
   );
 }
