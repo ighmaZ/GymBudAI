@@ -21,6 +21,7 @@ export const FEATURES: (Feature & { href?: string })[] = [
     title: "AI Form Correction",
     description:
       "Get real-time feedback on your exercise form to prevent injury and maximize results.",
+    href: "/form-correction",
   },
   {
     icon: Utensils,

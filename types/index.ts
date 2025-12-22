@@ -53,3 +53,34 @@ export interface FormAnalysisResult {
   tips: string[]; // actionable advice
   overallGrade: "A" | "B" | "C" | "D" | "F";
 }
+
+export interface MovementAnalysis {
+  // Which body parts moved the most (sorted by movement amount)
+  primaryMovement: string; // e.g., "elbows", "knees", "hips"
+  secondaryMovement: string;
+  primaryRange: number; // degrees of movement
+  secondaryRange: number;
+
+  // Range of motion for key joints (max - min angle during exercise)
+  elbowRangeLeft: number;
+  elbowRangeRight: number;
+  kneeRangeLeft: number;
+  kneeRangeRight: number;
+  hipRangeLeft: number;
+  hipRangeRight: number;
+  shoulderRangeLeft: number;
+  shoulderRangeRight: number;
+
+  // Body orientation and context
+  bodyOrientation: "upright" | "horizontal" | "inclined" | "prone";
+  armSymmetry: boolean; // both arms moving together (true) or alternating (false)
+  elbowShoulderRatio: number; // elbow movement / shoulder movement (high = isolation, low = compound)
+  isCompoundMovement: boolean; // multiple joints moving significantly
+
+  // Additional movement patterns
+  shoulderElevationRange: number; // For traps/shrugs (vertical shoulder movement)
+  hipAbductionRange: number; // Lateral hip movement (for hip abduction exercises)
+  ankleFlexionRange: number; // Ankle plantarflexion (for calf raises)
+  movementPlane: "sagittal" | "frontal" | "transverse"; // Movement direction
+  equipmentType: "barbell" | "dumbbell" | "bodyweight" | "cable"; // Equipment detection
+}
