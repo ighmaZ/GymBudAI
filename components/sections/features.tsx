@@ -24,9 +24,9 @@ export function Features({ className }: FeaturesProps) {
           title={feature.title}
           description={feature.description}
           index={index}
+          href={feature.href}
         />
       ))}
     </section>
   );
 }
-
