@@ -316,3 +316,5 @@ function calculateAverageMetrics(metrics: PoseMetrics[]): PoseMetrics {
     kneeOverToe: sum.kneeOverToe, // true if ANY frame had knees over toes
   };
 }
+
+

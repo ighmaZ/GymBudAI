@@ -14,46 +14,96 @@ datasource db {
 }
 
 model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String?
+  createdAt         DateTime  @default(now())
+  dailyCaloriesGoal Int       @default(2000)
+  meals             Meal[]
+  emailVerified     Boolean   @default(false)
+  image             String?
+  updatedAt         DateTime  @updatedAt
+  sessions          Session[]
+  accounts          Account[]
 
-  id String @id @default(cuid())
-  email String @unique
-  name String?
-  createdAt DateTime @default(now())
-  dailyCaloriesGoal Int @default(2000)
-  meals Meal[] 
+  @@map("user")
 }
 
 model Meal {
-
-  id String @id @default(cuid())
-  userId String
-  name String
-  imageUrl String?
-  totalCalories Int @default(0)
-  totalProtein Int @default(0)
-  totalCarbs Int @default(0)
-  totalFat Int @default(0)
-  createdAt DateTime @default(now())
-  food FoodItem[]
+  id            String     @id @default(cuid())
+  userId        String
+  name          String
+  imageUrl      String?
+  totalCalories Int        @default(0)
+  totalProtein  Int        @default(0)
+  totalCarbs    Int        @default(0)
+  totalFat      Int        @default(0)
+  createdAt     DateTime   @default(now())
+  food          FoodItem[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 }
 
 model FoodItem {
-
-  id String @id @default(cuid())
-  mealId String
-  name String
-  portion String
-  calories Int 
-  protein Int @default(0)
-  carbs Int @default(0)
-  fat Int @default(0)
-  confidence Float @default(0.8)
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  mealId     String
+  name       String
+  portion    String
+  calories   Int
+  protein    Int      @default(0)
+  carbs      Int      @default(0)
+  fat        Int      @default(0)
+  confidence Float    @default(0.8)
+  createdAt  DateTime @default(now())
 
   meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
 }
 
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
