@@ -2,11 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowLeft,
-  Sparkles,
-  Save,
-} from "lucide-react";
+import { ArrowLeft, Sparkles, Save } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -165,7 +161,6 @@ export default function WorkoutPlannerPage() {
                   disabled={generateMutation.isPending}
                   className="group flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-black hover:to-gray-900 text-gray-700 hover:text-white rounded-2xl transition-all duration-300 shadow-sm hover:shadow-lg"
                 >
-                  <Sparkles className="w-4 h-4 group-hover:animate-pulse" />
                   <span className="text-sm font-bold font-oswald uppercase tracking-wider">
                     AI Generate
                   </span>
@@ -201,19 +196,6 @@ export default function WorkoutPlannerPage() {
                   />
                 </div>
               </motion.div>
-
-              {workoutNotes.trim() && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 flex items-center gap-2 px-4 py-3 bg-green-50/80 backdrop-blur-sm rounded-2xl border border-green-200/50"
-                >
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs font-bold text-green-700 font-oswald uppercase tracking-wider">
-                    {workoutNotes.trim().split(/\r\n|\r|\n/).filter(line => line.trim()).length} lines ready to save
-                  </span>
-                </motion.div>
-              )}
             </motion.div>
           )}
 
