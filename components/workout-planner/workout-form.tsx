@@ -165,15 +165,7 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
               Generating...
             </>
           ) : (
-            <>
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                <Sparkles className="w-5 h-5" />
-              </motion.div>
-              Generate Plan
-            </>
+            <>Generate Plan</>
           )}
         </Button>
       </motion.div>
