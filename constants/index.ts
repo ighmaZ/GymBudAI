@@ -1,4 +1,4 @@
-import { Activity, Camera, Utensils } from "lucide-react";
+import { Activity, Camera, Dumbbell } from "lucide-react";
 import type { NavLink, Feature } from "@/types";
 
 export const NAV_LINKS: NavLink[] = [
@@ -24,10 +24,11 @@ export const FEATURES: (Feature & { href?: string })[] = [
     href: "/form-correction",
   },
   {
-    icon: Utensils,
-    title: "Diet Coach",
+    icon: Dumbbell,
+    title: "Workout Planner",
     description:
-      "Personalized meal plans and nutrition advice tailored to your specific body type and goals.",
+      "Plan, track, and customize your workout routines with manual entry or AI-powered personalized plans.",
+    href: "/workout-planner",
   },
 ];
 
