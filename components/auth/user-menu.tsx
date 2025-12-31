@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, User, Settings, ChevronDown } from "lucide-react";
+import { LogOut, User, Settings, ChevronDown, Loader2 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +18,7 @@ interface UserMenuProps {
 
 export function UserMenu({ session }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,14 +79,26 @@ export function UserMenu({ session }: UserMenuProps) {
               <div className="h-px bg-gray-100 my-1 mx-2" />
 
               <button
+                disabled={isSigningOut}
                 onClick={async () => {
-                  await signOut();
-                  setIsOpen(false);
+                  setIsSigningOut(true);
+                  try {
+                    await signOut();
+                  } catch (error) {
+                    console.error("Sign out failed", error);
+                    setIsSigningOut(false);
+                  }
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left group"
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left group disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                <span className="font-medium">Sign Out</span>
+                {isSigningOut ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                )}
+                <span className="font-medium">
+                  {isSigningOut ? "Signing Out" : "Sign Out"}
+                </span>
               </button>
             </div>
           </motion.div>
