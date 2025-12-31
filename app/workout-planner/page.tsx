@@ -208,36 +208,28 @@ export default function WorkoutPlannerPage() {
               transition={{ duration: 0.3 }}
               className="space-y-8"
             >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center space-y-4"
-              >
                 <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                  className="w-20 h-20 bg-gradient-to-br from-black to-gray-800 text-white rounded-3xl flex items-center justify-center mx-auto shadow-2xl"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-2 mb-10"
                 >
-                  <Sparkles className="w-10 h-10" />
+                  <motion.h2
+                    className="text-4xl font-black font-oswald uppercase tracking-tighter text-black"
+                  >
+                    WORKOUT PLANNER
+                  </motion.h2>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "80px" }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                    className="h-1.5 bg-black rounded-full mx-auto my-4"
+                  />
+                  <motion.p
+                    className="text-gray-400 font-medium tracking-wide text-sm uppercase"
+                  >
+                    Customized Weekly Routine
+                  </motion.p>
                 </motion.div>
-                <motion.h2
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-3xl font-bold font-oswald uppercase tracking-tight bg-gradient-to-r from-black to-gray-700 bg-clip-text text-transparent"
-                >
-                  AI Workout Planner
-                </motion.h2>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-gray-500 font-medium"
-                >
-                  Create your personalized weekly workout plan
-                </motion.p>
-              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
