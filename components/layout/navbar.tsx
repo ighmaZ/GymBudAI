@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { fadeInLeft, fadeInDown, fadeInRight, transitions } from "@/lib/animations";
 import { NAV_LINKS, SITE_CONFIG } from "@/constants";
-import { useSession, signOut } from "@/lib/auth-client";
-import { LogOut, User } from "lucide-react";
+import { useSession } from "@/lib/auth-client";
+import { UserMenu } from "@/components/auth/user-menu";
+
 
 interface NavbarProps {
   className?: string;
@@ -70,25 +71,7 @@ export function Navbar({ className }: NavbarProps) {
           {isPending ? (
             <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
           ) : session?.user ? (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-bold uppercase">
-                  {session.user.name?.charAt(0) || session.user.email?.charAt(0) || <User className="w-5 h-5" />}
-                </div>
-                <span className="text-sm font-medium hidden lg:block">
-                  {session.user.name || session.user.email}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => signOut()}
-                className="flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden lg:inline">Sign Out</span>
-              </Button>
-            </div>
+            <UserMenu session={session} />
           ) : (
             <Button
               variant="outline"
