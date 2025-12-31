@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, User, Settings, ChevronDown, Loader2 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface UserMenuProps {
   session: {
@@ -43,9 +44,19 @@ export function UserMenu({ session }: UserMenuProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 focus:outline-none"
       >
-        <div className="w-10 h-10 bg-gradient-to-tr from-gray-900 to-gray-700 text-white rounded-full flex items-center justify-center font-bold uppercase shadow-md ring-2 ring-transparent hover:ring-gray-200 transition-all">
-          {userInitial}
-        </div>
+        {session.user.image ? (
+          <Image
+            src={session.user.image}
+            alt={session.user.name || "User"}
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full shadow-md ring-2 ring-transparent hover:ring-gray-200 transition-all object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 bg-gradient-to-tr from-gray-900 to-gray-700 text-white rounded-full flex items-center justify-center font-bold uppercase shadow-md ring-2 ring-transparent hover:ring-gray-200 transition-all">
+            {userInitial}
+          </div>
+        )}
       </motion.button>
 
       <AnimatePresence>
