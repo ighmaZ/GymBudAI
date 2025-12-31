@@ -220,7 +220,7 @@ export default function WorkoutPlannerPage() {
                   </motion.h2>
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: "120px" }}
+                    animate={{ width: "180px" }}
                     transition={{ delay: 0.2, duration: 0.4 }}
                     className="h-1.5 bg-black rounded-full mx-auto my-4"
                   />
