@@ -2,10 +2,9 @@ import { Activity, Camera, Dumbbell } from "lucide-react";
 import type { NavLink, Feature } from "@/types";
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "About", href: "#about" },
-  { label: "Trainings", href: "#trainings" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Contacts", href: "#contacts" },
+  { label: "Count Calories", href: "/calories" },
+  { label: "Form Correction", href: "/form-correction" },
+  { label: "Workout Planner", href: "/workout-planner" },
 ];
 
 export const FEATURES: (Feature & { href?: string })[] = [

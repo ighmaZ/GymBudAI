@@ -8,6 +8,7 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { fadeInLeft, fadeInDown, fadeInRight, transitions } from "@/lib/animations";
 import { NAV_LINKS, SITE_CONFIG } from "@/constants";
 import { useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 import { UserMenu } from "@/components/auth/user-menu";
 
 
@@ -18,6 +19,7 @@ interface NavbarProps {
 export function Navbar({ className }: NavbarProps) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { data: session, isPending } = useSession();
+  const router = useRouter();
 
   return (
     <>
@@ -50,13 +52,21 @@ export function Navbar({ className }: NavbarProps) {
           className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-wide"
         >
           {NAV_LINKS.map((link) => (
-            <a
+            <button
               key={link.href}
-              href={link.href}
-              className="hover:text-gray-600 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                if (session?.user) {
+                  router.push(link.href);
+                } else {
+                  setIsAuthModalOpen(true);
+                }
+              }}
+              className="group relative hover:text-gray-600 transition-colors cursor-pointer"
             >
               {link.label}
-            </a>
+              <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-gray-600 transition-all duration-300 group-hover:w-full" />
+            </button>
           ))}
         </motion.div>
 
