@@ -35,8 +35,7 @@ export const SITE_CONFIG = {
   name: "GYMBUD AI",
   tagline: "Achieve Your Fitness Goals",
   heroTitle: ["Find Your", "Strength"],
-  heroDescription:
-    "We are dedicated to helping you achieve your fitness goals and improve your overall health and well-being through AI-powered coaching.",
+
   heroImage:
     "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop",
   videoDuration: "3 min",
