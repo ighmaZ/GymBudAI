@@ -26,18 +26,22 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setError(null);
 
     try {
-      if (mode === "signup") {
-        await signUp.email({
-          email,
-          password,
-          name,
-        });
-      } else {
-        await signIn.email({
-          email,
-          password,
-        });
+      const res = mode === "signup"
+        ? await signUp.email({
+            email,
+            password,
+            name,
+          })
+        : await signIn.email({
+            email,
+            password,
+          });
+
+      if (res.error) {
+        setError(res.error.message || "Authentication failed");
+        return;
       }
+
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
