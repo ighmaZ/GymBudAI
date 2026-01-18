@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limiter";
 
 export async function GET(request: NextRequest) {
+  // Rate limit check (60 requests per minute for CRUD routes)
+  const rateLimitResponse = rateLimit(request, "CRUD");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const session = await auth.api.getSession({
       headers: request.headers,
@@ -44,6 +49,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit check (60 requests per minute for CRUD routes)
+  const rateLimitResponse = rateLimit(request, "CRUD");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const session = await auth.api.getSession({
       headers: request.headers,

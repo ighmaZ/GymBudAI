@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateWorkoutPlan, type WorkoutPlanRequest } from "@/lib/gemini-workout-planner";
+import { rateLimit } from "@/lib/rate-limiter";
 
 export async function POST(request: NextRequest) {
+  // Rate limit check (10 requests per minute for AI routes)
+  const rateLimitResponse = rateLimit(request, "AI");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { age, weight, height, goal, frequency } = body as WorkoutPlanRequest;

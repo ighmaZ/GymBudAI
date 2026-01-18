@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeFoodImage } from "@/lib/openai";
+import { analyzeFoodImage } from "@/lib/groqai";
+import { rateLimit } from "@/lib/rate-limiter";
 
 export async function POST(request: NextRequest) {
+  // Rate limit check (10 requests per minute for AI routes)
+  const rateLimitResponse = rateLimit(request, "AI");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     // 1. Get the image from request body
     const body = await request.json();

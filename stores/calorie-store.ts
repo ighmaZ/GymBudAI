@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { AnalyzedFood } from "@/lib/openai";
+import type { AnalyzedFood } from "@/lib/groqai";
 
 interface CalorieState {
   // Upload state

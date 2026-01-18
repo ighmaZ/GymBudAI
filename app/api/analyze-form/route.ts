@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeFormWithGemini } from "@/lib/gemini-form-analysis";
+import { rateLimit } from "@/lib/rate-limiter";
 
 interface AnalyzeFormRequest {
   videoBase64: string;
@@ -7,6 +8,10 @@ interface AnalyzeFormRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit check (10 requests per minute for AI routes)
+  const rateLimitResponse = rateLimit(request, "AI");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body: AnalyzeFormRequest = await request.json();
     const { videoBase64, mimeType } = body;

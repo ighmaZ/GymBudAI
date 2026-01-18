@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limiter";
 
 interface FoodInput {
   name: string;
@@ -20,6 +21,10 @@ interface MacroTotals {
 
 // GET - Fetch meals for a user (by date)
 export async function GET(request: NextRequest) {
+  // Rate limit check (60 requests per minute for CRUD routes)
+  const rateLimitResponse = rateLimit(request, "CRUD");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
@@ -72,6 +77,10 @@ export async function GET(request: NextRequest) {
 
 // POST - Create a new meal
 export async function POST(request: NextRequest) {
+  // Rate limit check (60 requests per minute for CRUD routes)
+  const rateLimitResponse = rateLimit(request, "CRUD");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { userId, name, imageUrl, foods } = body as {

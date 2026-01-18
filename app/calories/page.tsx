@@ -20,7 +20,7 @@ import { CalorieRing } from "@/components/calories/calorie-ring";
 import { MealCard } from "@/components/calories/meal-card";
 import { Button } from "@/components/ui/button";
 import { useCalorieStore } from "@/stores/calorie-store";
-import type { FoodAnalysisResult } from "@/lib/openai";
+import type { FoodAnalysisResult } from "@/lib/groqai";
 
 // Types for meal data
 interface MealData {
