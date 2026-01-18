@@ -1,36 +1,269 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+![GYMBUD AI Banner](https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop)
 
-First, run the development server:
+# 🏋️ GYMBUD AI
+
+**Achieve Your Fitness Goals with AI-Powered Guidance**
+
+[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+
+An intelligent fitness companion that leverages cutting-edge AI technology to help you track nutrition, perfect your exercise form, and create personalized workout plans.
+
+[Live Demo](https://gymbudai.vercel.app) · [Report Bug](https://github.com/yourusername/gymbudai/issues) · [Request Feature](https://github.com/yourusername/gymbudai/issues)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [About](#-about)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Project Structure](#-project-structure)
+- [API Routes](#-api-routes)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## ✨ About
+
+GYMBUD AI is a comprehensive fitness platform that combines multiple AI services to provide:
+
+- **Intelligent Nutrition Tracking**: Snap a photo of your meal and get instant calorie and macronutrient analysis
+- **Real-time Form Correction**: Upload exercise videos and receive AI-powered feedback on your technique
+- **Personalized Workout Planning**: Generate custom workout routines based on your fitness goals, schedule, and preferences
+
+Built with modern web technologies and integrated with industry-leading AI models, GYMBUD AI delivers a seamless and responsive user experience across all devices.
+
+---
+
+## 🚀 Features
+
+### 📊 Calorie Tracking
+
+- **AI-Powered Food Recognition**: Upload meal photos and instantly identify foods using OpenAI's Vision API
+- **Comprehensive Nutritional Analysis**: Get detailed breakdowns of calories, protein, carbs, and fat
+- **Daily Progress Tracking**: Visual progress ring showing daily calorie goals
+- **Meal History**: Log and review your meals over time
+- **Macronutrient Dashboard**: Track protein, carbs, and fat intake throughout the day
+
+### 🎯 Form Correction
+
+- **Video Analysis**: Upload videos of your exercises for AI-powered form evaluation
+- **Real-time Feedback**: Get instant analysis using Google Gemini AI and MediaPipe
+- **Form Scoring**: Receive numerical scores on exercise technique
+- **Corrective Suggestions**: Get specific tips to improve your form
+- **Multi-Exercise Support**: Works with various exercises including squats, deadlifts, bench press, and more
+
+### 💪 Workout Planner
+
+- **AI-Generated Routines**: Create personalized workout plans based on your goals
+- **Customizable Parameters**: Input age, weight, height, fitness goals, and workout frequency
+- **Manual Entry**: Manually create and edit workout routines
+- **Save & Track**: Save your workouts and track your progress over time
+- **Weekly Planning**: Organize workouts by days for optimal scheduling
+
+
+## 🛠 Tech Stack
+
+### Frontend
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: Custom components with Framer Motion animations
+- **State Management**: Zustand
+- **Data Fetching**: TanStack Query (React Query)
+- **Form Handling**: React Hook Form
+
+### Backend
+
+- **API**: Next.js API Routes
+- **ORM**: Prisma
+- **Database**: PostgreSQL (Neon Serverless)
+- **Authentication**: Better-auth
+
+### AI & ML Services
+
+- **Computer Vision**: Google Gemini AI
+- **Food Recognition**: Google Gemini AI
+
+
+
+## 📦 Getting Started
+
+### Prerequisites
+
+- Node.js 20.x or higher
+- Yarn package manager
+- PostgreSQL database (Neon recommended)
+- Google Gemini API key
+
+### Installation
+
+1. **Clone the repository**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/gymbudai.git
+cd gymbudai
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **Set up environment variables**
 
-## Learn More
+Create a `.env.local` file in the root directory and add the required variables (see [Environment Variables](#environment-variables)).
 
-To learn more about Next.js, take a look at the following resources:
+4. **Set up the database**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Run Prisma migrations
+npx prisma migrate dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Generate Prisma client
+npx prisma generate
+```
 
-## Deploy on Vercel
+5. **Run the development server**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+yarn dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. **Open your browser**
+
+Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
+
+### Building for Production
+
+```bash
+# Build the application
+yarn build
+
+# Start the production server
+yarn start
+```
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```bash
+# Database
+DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
+
+# Authentication
+AUTH_SECRET="your-random-secret-key"
+AUTH_URL="http://localhost:3000"
+
+# AI Services
+GEMINI_API_KEY="your-gemini-api-key"
+
+
+# Application
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
+
+
+
+
+---
+
+## 📁 Project Structure
+
+```
+gymbudai/
+├── app/                          # Next.js app directory
+│   ├── calories/                 # Calorie tracking page
+│   ├── form-correction/          # Form correction page
+│   ├── workout-planner/          # Workout planner page
+│   ├── layout.tsx               # Root layout
+│   └── page.tsx                 # Home page
+├── components/                   # React components
+│   ├── calories/                # Calorie-related components
+│   ├── form-correction/         # Form correction components
+│   ├── workout-planner/         # Workout planner components
+│   └── ui/                      # Shared UI components
+├── lib/                          # Utility libraries
+│   ├── auth.ts                  # Authentication utilities
+│   ├── prisma.ts                # Prisma client
+│   ├── openai.ts                # OpenAI integration
+│   ├── gemini-*.ts              # Gemini AI integrations
+│   └── utils.ts                 # General utilities
+├── prisma/                       # Database schema
+│   └── schema.prisma            # Prisma schema
+├── stores/                       # Zustand stores
+├── types/                        # TypeScript type definitions
+├── constants/                    # App constants
+├── public/                       # Static assets
+└── [config files]               # Next.js, TypeScript, Tailwind configs
+```
+
+---
+
+## 🛡️ API Routes
+
+The application includes several API endpoints:
+
+### Authentication
+
+- `POST /api/auth/*` - Authentication endpoints (handled by Better-auth)
+
+### Calorie Tracking
+
+- `GET /api/meals` - Fetch user meals
+- `POST /api/meals` - Create a new meal
+- `POST /api/analyze-food` - Analyze food image using AI
+
+### Form Correction
+
+- `POST /api/analyze-form` - Analyze exercise video using AI
+
+### Workout Planner
+
+- `GET /api/workouts` - Fetch user workouts
+- `POST /api/workouts` - Save a workout
+- `POST /api/generate-workout` - Generate AI workout plan
+
+---
+
+
+
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) for the amazing framework
+- [Google](https://ai.google.dev/) for Gemini AI
+- [Vercel](https://vercel.com/) for hosting platform
+
+
+---
+
+<div align="center">
+
+**Built with ❤️ using Next.js & AI**
+
+[⬆ Back to Top](#-gymbud-ai)
+
+</div>
