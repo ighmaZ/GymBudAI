@@ -97,6 +97,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify user exists (should be authenticated)
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: "User not found. Please sign in." },
+        { status: 404 }
+      );
+    }
+
     // Calculate totals from foods
     const totals = foods.reduce<MacroTotals>(
       (acc, food) => ({

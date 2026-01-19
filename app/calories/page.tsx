@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
-  Plus,
   ChevronRight,
   Utensils,
   Flame,
@@ -20,6 +19,7 @@ import { CalorieRing } from "@/components/calories/calorie-ring";
 import { MealCard } from "@/components/calories/meal-card";
 import { Button } from "@/components/ui/button";
 import { useCalorieStore } from "@/stores/calorie-store";
+import { useSession } from "@/lib/auth-client";
 import type { FoodAnalysisResult } from "@/lib/groqai";
 
 // Types for meal data
@@ -43,11 +43,12 @@ interface MealData {
   }[];
 }
 
-const MOCK_USER_ID = "demo-user-123";
 const DAILY_GOAL = 2000;
 
 export default function CaloriesPage() {
   const queryClient = useQueryClient();
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
   const [showUpload, setShowUpload] = useState(false);
   const [analysisResult, setAnalysisResult] =
     useState<FoodAnalysisResult | null>(null);
@@ -59,14 +60,16 @@ export default function CaloriesPage() {
   const displayDate = format(new Date(), "EEEE, MMM d");
 
   const { data: meals = [], isLoading: mealsLoading } = useQuery({
-    queryKey: ["meals", MOCK_USER_ID, today],
+    queryKey: ["meals", userId, today],
     queryFn: async () => {
+      if (!userId) throw new Error("Not authenticated");
       const res = await fetch(
-        `/api/meals?userId=${MOCK_USER_ID}&date=${today}`
+        `/api/meals?userId=${userId}&date=${today}`
       );
       if (!res.ok) throw new Error("Failed to fetch meals");
       return res.json();
     },
+    enabled: !!userId,
   });
 
   interface DailyTotals {
@@ -108,19 +111,24 @@ export default function CaloriesPage() {
 
   const saveMealMutation = useMutation({
     mutationFn: async () => {
-      if (!analysisResult) return;
+      if (!analysisResult || !userId) return;
 
       const res = await fetch("/api/meals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: MOCK_USER_ID,
+          userId,
           name: analysisResult.mealSuggestion,
           imageUrl: null,
           foods: analysisResult.foods,
         }),
       });
-      if (!res.ok) throw new Error("Failed to save meal");
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("Failed to save meal:", errorData);
+        throw new Error(errorData.error || "Failed to save meal");
+      }
       return res.json();
     },
     onSuccess: () => {
@@ -128,6 +136,10 @@ export default function CaloriesPage() {
       setAnalysisResult(null);
       setCurrentImageBase64(null);
       setShowUpload(false);
+    },
+    onError: (error: Error) => {
+      console.error("Save meal error:", error);
+      alert(`Failed to save meal: ${error.message}. Please try again.`);
     },
   });
 
@@ -152,6 +164,33 @@ export default function CaloriesPage() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white flex items-center justify-center px-6">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+            <Utensils className="w-10 h-10 text-gray-400" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold font-oswald uppercase tracking-tight">
+              Sign In Required
+            </h2>
+            <p className="text-gray-500 font-medium">
+              Please sign in to track your calories and meals
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
