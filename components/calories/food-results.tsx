@@ -36,10 +36,7 @@ export function FoodResults({
     >
       {/* Header */}
       <div className="text-center space-y-1">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-bold uppercase tracking-wider mb-2">
-          <Activity className="w-3 h-3" />
-          AI Analysis Complete
-        </div>
+       
         <h3 className="text-3xl font-bold font-oswald uppercase tracking-tight">
           {mealSuggestion} Detected
         </h3>
@@ -129,7 +126,7 @@ export function FoodResults({
         </Button>
         <Button
           size="lg"
-          className="h-14 rounded-2xl bg-black text-white hover:bg-gray-900 shadow-xl shadow-black/10 font-bold"
+          className="h-14 rounded-2xl bg-black text-white hover:bg-gray-900 shadow-xl shadow-black/10 font-bold flex items-center justify-center gap-2"
           onClick={onConfirm}
           disabled={isLoading}
         >
@@ -137,8 +134,8 @@ export function FoodResults({
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             <>
-              <Check className="w-5 h-5 mr-2" />
-              Save Log
+              <Check className="w-5 h-5" />
+              SAVE LOG
             </>
           )}
         </Button>
