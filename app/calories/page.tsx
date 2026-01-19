@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 import { ImageUpload } from "@/components/calories/image-upload";
 import { FoodResults } from "@/components/calories/food-results";
@@ -105,7 +106,7 @@ export default function CaloriesPage() {
     },
     onError: () => {
       setIsAnalyzing(false);
-      alert("Failed to analyze food. Please try again.");
+      toast.error("Failed to analyze food. Please try again.");
     },
   });
 
@@ -139,7 +140,7 @@ export default function CaloriesPage() {
     },
     onError: (error: Error) => {
       console.error("Save meal error:", error);
-      alert(`Failed to save meal: ${error.message}. Please try again.`);
+      toast.error(`Failed to save meal: ${error.message}`);
     },
   });
 
