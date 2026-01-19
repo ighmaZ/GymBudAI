@@ -18,6 +18,7 @@ import { ImageUpload } from "@/components/calories/image-upload";
 import { FoodResults } from "@/components/calories/food-results";
 import { CalorieRing } from "@/components/calories/calorie-ring";
 import { MealCard } from "@/components/calories/meal-card";
+import { GoalSettings } from "@/components/calories/goal-settings";
 import { Button } from "@/components/ui/button";
 import { useCalorieStore } from "@/stores/calorie-store";
 import { useSession } from "@/lib/auth-client";
@@ -44,7 +45,7 @@ interface MealData {
   }[];
 }
 
-const DAILY_GOAL = 2000;
+const DEFAULT_DAILY_GOAL = 2000;
 
 export default function CaloriesPage() {
   const queryClient = useQueryClient();
@@ -59,6 +60,20 @@ export default function CaloriesPage() {
 
   const today = format(new Date(), "yyyy-MM-dd");
   const displayDate = format(new Date(), "EEEE, MMM d");
+
+  // Fetch user's calorie goal
+  const { data: userSettings } = useQuery({
+    queryKey: ["userSettings", userId],
+    queryFn: async () => {
+      if (!userId) throw new Error("Not authenticated");
+      const res = await fetch(`/api/user/settings?userId=${userId}`);
+      if (!res.ok) throw new Error("Failed to fetch settings");
+      return res.json() as Promise<{ dailyCaloriesGoal: number }>;
+    },
+    enabled: !!userId,
+  });
+
+  const dailyGoal = userSettings?.dailyCaloriesGoal ?? DEFAULT_DAILY_GOAL;
 
   const { data: meals = [], isLoading: mealsLoading } = useQuery({
     queryKey: ["meals", userId, today],
@@ -207,7 +222,11 @@ export default function CaloriesPage() {
           <h1 className="text-lg font-bold font-oswald uppercase tracking-wide">
             {showUpload ? "Add Meal" : "Dashboard"}
           </h1>
-          <div className="w-9" />
+          {!showUpload && userId ? (
+            <GoalSettings userId={userId} currentGoal={dailyGoal} />
+          ) : (
+            <div className="w-9" />
+          )}
         </div>
       </header>
 
@@ -276,7 +295,7 @@ export default function CaloriesPage() {
 
                     <CalorieRing
                       consumed={dailyTotals.calories}
-                      goal={DAILY_GOAL}
+                      goal={dailyGoal}
                       size={220}
                       strokeWidth={12}
                       className="mb-8"
