@@ -6,9 +6,6 @@
 
 **Achieve Your Fitness Goals with AI-Powered Guidance**
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
 An intelligent fitness companion that leverages cutting-edge AI technology to help you track nutrition, perfect your exercise form, and create personalized workout plans.
 
@@ -44,9 +41,9 @@ Built with modern web technologies and integrated with industry-leading AI model
 
 ---
 
-## 🚀 Features
+##  Features
 
-### 📊 Calorie Tracking
+###  Calorie Tracking
 
 - **AI-Powered Food Recognition**: Upload meal photos and instantly identify foods using OpenAI's Vision API
 - **Comprehensive Nutritional Analysis**: Get detailed breakdowns of calories, protein, carbs, and fat
@@ -54,7 +51,7 @@ Built with modern web technologies and integrated with industry-leading AI model
 - **Meal History**: Log and review your meals over time
 - **Macronutrient Dashboard**: Track protein, carbs, and fat intake throughout the day
 
-### 🎯 Form Correction
+###  Form Correction
 
 - **Video Analysis**: Upload videos of your exercises for AI-powered form evaluation
 - **Real-time Feedback**: Get instant analysis using Google Gemini AI and MediaPipe
@@ -62,7 +59,7 @@ Built with modern web technologies and integrated with industry-leading AI model
 - **Corrective Suggestions**: Get specific tips to improve your form
 - **Multi-Exercise Support**: Works with various exercises including squats, deadlifts, bench press, and more
 
-### 💪 Workout Planner
+###  Workout Planner
 
 - **AI-Generated Routines**: Create personalized workout plans based on your goals
 - **Customizable Parameters**: Input age, weight, height, fitness goals, and workout frequency
@@ -71,7 +68,7 @@ Built with modern web technologies and integrated with industry-leading AI model
 - **Weekly Planning**: Organize workouts by days for optimal scheduling
 
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 ### Frontend
 
