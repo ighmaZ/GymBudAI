@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, User, Settings, ChevronDown, Loader2 } from "lucide-react";
+import { LogOut, User, ChevronDown, Loader2 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -76,18 +76,6 @@ export function UserMenu({ session }: UserMenuProps) {
             </div>
 
             <div className="p-2">
-              <button
-                onClick={() => {
-                   // Placeholder for future profile/settings
-                   setIsOpen(false);
-                }}
-                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100/50 rounded-xl transition-colors text-left"
-              >
-                <Settings className="w-4 h-4 text-gray-500" />
-                <span>Settings</span>
-              </button>
-
-              <div className="h-px bg-gray-100 my-1 mx-2" />
 
               <button
                 disabled={isSigningOut}
