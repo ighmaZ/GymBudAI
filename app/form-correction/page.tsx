@@ -96,7 +96,7 @@ export default function FormCorrectionPage() {
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto px-6 py-8 pb-32">
+      <main className="max-w-xl mx-auto px-6 min-h-[calc(100vh-80px)] flex flex-col">
         <AnimatePresence mode="wait">
           {/* Upload State */}
           {pageState === "upload" && (
@@ -105,9 +105,9 @@ export default function FormCorrectionPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-8"
+              className="flex flex-col min-h-full"
             >
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 pt-16 pb-8">
                 <h2 className="text-3xl font-bold font-oswald uppercase tracking-tight">
                   Check Your Form
                 </h2>
@@ -116,10 +116,12 @@ export default function FormCorrectionPage() {
                 </p>
               </div>
 
-              <VideoUpload
-                onVideoSelect={handleVideoSelect}
-                isLoading={false}
-              />
+              <div className="flex-1 flex items-center">
+                <VideoUpload
+                  onVideoSelect={handleVideoSelect}
+                  isLoading={false}
+                />
+              </div>
             </motion.div>
           )}
 
