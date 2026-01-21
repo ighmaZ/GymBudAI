@@ -124,7 +124,7 @@ export default function WorkoutPlannerPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white text-black font-sans selection:bg-black selection:text-white">
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-gray-100/50">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href="/"

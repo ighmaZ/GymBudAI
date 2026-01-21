@@ -211,7 +211,7 @@ export default function CaloriesPage() {
   return (
     <div className="min-h-screen bg-white text-black font-sans selection:bg-black selection:text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href="/"
