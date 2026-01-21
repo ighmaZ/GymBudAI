@@ -23,6 +23,12 @@ const oswald = Oswald({
 export const metadata: Metadata = {
   title: "GymBud AI",
   description: "Your AI Fitness Coach",
+  icons: {
+    icon: [
+      { url: "/icon.svg", sizes: "any", type: "image/svg+xml" },
+      { url: "/icon-light.svg", sizes: "any", type: "image/svg+xml", media: "(prefers-color-scheme: light)" },
+    ],
+  },
 };
 
 export default function RootLayout({
