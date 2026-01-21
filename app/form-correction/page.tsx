@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Activity, Sparkles, Eye } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 
@@ -120,34 +120,6 @@ export default function FormCorrectionPage() {
                 onVideoSelect={handleVideoSelect}
                 isLoading={false}
               />
-
-              {/* Feature highlights */}
-              <div className="grid grid-cols-3 gap-4 pt-4">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                    <Eye className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    AI Vision
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                    <Activity className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Form Score
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                    <Sparkles className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Pro Tips
-                  </p>
-                </div>
-              </div>
             </motion.div>
           )}
 
