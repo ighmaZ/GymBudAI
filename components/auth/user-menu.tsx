@@ -66,7 +66,7 @@ export function UserMenu({ session }: UserMenuProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute right-0 mt-3 w-64 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden z-50 origin-top-right"
+            className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 origin-top-right"
           >
             <div className="p-4 border-b border-gray-100">
               <p className="text-sm font-semibold text-gray-900 truncate">
