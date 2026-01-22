@@ -4,7 +4,7 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-type ButtonVariant = "primary" | "outline" | "ghost";
+type ButtonVariant = "primary" | "outline" | "ghost" | "destructive";
 type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps
@@ -20,6 +20,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   outline:
     "border border-black bg-transparent hover:bg-black hover:text-white",
   ghost: "bg-transparent hover:bg-gray-100",
+  destructive: "bg-red-600 text-white hover:bg-red-700",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -46,7 +47,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          "font-bold uppercase tracking-wide transition-all",
+          "inline-flex items-center justify-center font-bold uppercase tracking-wide transition-all",
           variantStyles[variant],
           sizeStyles[size],
           rounded ? "rounded-full" : "rounded-lg",
