@@ -88,7 +88,7 @@ export function Navbar({ className }: NavbarProps) {
               size="md"
               onClick={() => setIsAuthModalOpen(true)}
             >
-              Join Today
+              Login
             </Button>
           )}
         </motion.div>
