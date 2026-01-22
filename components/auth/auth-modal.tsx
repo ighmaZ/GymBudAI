@@ -99,7 +99,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             className={cn(
               "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
               "w-[90%] md:w-full max-w-md bg-white rounded-2xl shadow-2xl",
-              "p-6 md:p-8"
+              "p-6 md:p-8 text-gray-900"
             )}
           >
             {/* Close Button */}
