@@ -7,13 +7,14 @@ export const NAV_LINKS: NavLink[] = [
   { label: "Workout Planner", href: "/workout-planner" },
 ];
 
-export const FEATURES: (Feature & { href?: string })[] = [
+export const FEATURES: (Feature & { href?: string; image: string })[] = [
   {
     icon: Activity,
     title: "Count Calories",
     description:
       "Track your daily intake with precision using our advanced AI food recognition system.",
     href: "/calories",
+    image: "/features/calorie-tracker.png",
   },
   {
     icon: Camera,
@@ -21,6 +22,7 @@ export const FEATURES: (Feature & { href?: string })[] = [
     description:
       "Get real-time feedback on your exercise form to prevent injury and maximize results.",
     href: "/form-correction",
+    image: "/features/form-correction.png",
   },
   {
     icon: Dumbbell,
@@ -28,6 +30,7 @@ export const FEATURES: (Feature & { href?: string })[] = [
     description:
       "Plan, track, and customize your workout routines with manual entry or AI-powered personalized plans.",
     href: "/workout-planner",
+    image: "/features/workout-planner.png",
   },
 ];
 
