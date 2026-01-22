@@ -28,7 +28,7 @@ export function Navbar({ className }: NavbarProps) {
           "fixed top-0 left-0 right-0 z-50",
           "flex items-center justify-between",
           "px-6 py-6 md:px-12 max-w-7xl mx-auto w-full",
-          "bg-white",
+          "bg-transparent",
           className
         )}
       >
@@ -62,10 +62,10 @@ export function Navbar({ className }: NavbarProps) {
                   setIsAuthModalOpen(true);
                 }
               }}
-              className="group relative hover:text-gray-600 transition-colors cursor-pointer"
+              className="group relative hover:text-gray-300 transition-colors cursor-pointer text-white"
             >
               {link.label}
-              <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-gray-600 transition-all duration-300 group-hover:w-full" />
+              <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-white transition-all duration-300 group-hover:w-full" />
             </button>
           ))}
         </motion.div>
@@ -84,7 +84,7 @@ export function Navbar({ className }: NavbarProps) {
             <UserMenu session={session} />
           ) : (
             <Button
-              variant="outline"
+              className="bg-white text-black hover:bg-gray-200 border-none" 
               size="md"
               onClick={() => setIsAuthModalOpen(true)}
             >

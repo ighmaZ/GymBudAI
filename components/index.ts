@@ -6,8 +6,8 @@ export { FeatureCard } from "./ui/feature-card";
 export { Navbar } from "./layout/navbar";
 
 // Section Components
-export { Hero } from "./sections/hero";
 export { Features } from "./sections/features";
+export { ScrollyTelling } from "./sections/scrolly-telling";
 
 // Form Correction Components
 export { VideoUpload } from "./form-correction/video-upload";
