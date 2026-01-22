@@ -98,8 +98,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={cn(
               "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
-              "w-full max-w-md bg-white rounded-2xl shadow-2xl",
-              "p-8"
+              "w-[90%] md:w-full max-w-md bg-white rounded-2xl shadow-2xl",
+              "p-6 md:p-8"
             )}
           >
             {/* Close Button */}
