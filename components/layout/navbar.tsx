@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,19 @@ export function Navbar({ className }: NavbarProps) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { data: session, isPending } = useSession();
   const router = useRouter();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Change navbar styling when scrolled past hero section (approximately)
+      setIsScrolled(window.scrollY > window.innerHeight * 0.7);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -54,7 +65,10 @@ export function Navbar({ className }: NavbarProps) {
            initial="hidden"
            animate="visible"
            transition={transitions.default}
-           className="text-2xl font-bold font-oswald tracking-tighter uppercase relative z-50"
+           className={cn(
+             "text-2xl font-bold font-oswald tracking-tighter uppercase relative z-50 transition-colors duration-300",
+             isScrolled ? "text-black" : "text-white"
+           )}
          >
            {SITE_CONFIG.name}
         </motion.div>
@@ -100,7 +114,12 @@ export function Navbar({ className }: NavbarProps) {
             <UserMenu session={session} />
           ) : (
             <Button
-              className="bg-white text-black hover:bg-gray-200 border-none"
+              className={cn(
+                "border-2 transition-colors duration-300",
+                isScrolled
+                  ? "bg-black text-white hover:bg-gray-800 border-white"
+                  : "bg-white text-black hover:bg-gray-200 border-white"
+              )}
               size="md"
               onClick={() => setIsAuthModalOpen(true)}
             >
@@ -113,7 +132,10 @@ export function Navbar({ className }: NavbarProps) {
         <div className="md:hidden z-50">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-white p-2"
+            className={cn(
+              "p-2 transition-colors duration-300",
+              isScrolled ? "text-black" : "text-white"
+            )}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
