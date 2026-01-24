@@ -65,10 +65,7 @@ export function Navbar({ className }: NavbarProps) {
            initial="hidden"
            animate="visible"
            transition={transitions.default}
-           className={cn(
-             "text-2xl font-bold font-oswald tracking-tighter uppercase relative z-50 transition-colors duration-300",
-             isScrolled ? "text-black" : "text-white"
-           )}
+           className="text-2xl font-bold font-oswald tracking-tighter uppercase relative z-50 text-white"
          >
            {SITE_CONFIG.name}
         </motion.div>
