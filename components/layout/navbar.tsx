@@ -145,7 +145,7 @@ export function Navbar({ className }: NavbarProps) {
               isScrolled ? "text-black" : "text-white"
             )}
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMobileMenuOpen ? <X size={40} /> : <Menu size={40} />}
           </button>
         </div>
 
