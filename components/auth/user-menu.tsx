@@ -59,24 +59,44 @@ export function UserMenu({ session }: UserMenuProps) {
         )}
       </motion.button>
 
-      <AnimatePresence>
+<AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(4px)" }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 origin-top-right"
+            className="absolute right-0 mt-3 w-64 bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 ring-1 ring-black/5 overflow-hidden z-50 origin-top-right"
           >
-            <div className="p-4 border-b border-gray-100">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {session.user.name || "User"}
-              </p>
-              <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+            <div className="p-4 border-b border-black/5 bg-gradient-to-b from-white/50 to-transparent">
+              <div className="flex items-center gap-3">
+                {session.user.image ? (
+                   <div className="relative">
+                    <Image
+                      src={session.user.image}
+                      alt={session.user.name || "User"}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full shadow-sm object-cover ring-2 ring-white"
+                    />
+                   </div>
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm ring-2 ring-white">
+                    {userInitial}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-gray-900 truncate leading-tight">
+                    {session.user.name || "User"}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate font-medium mt-0.5">
+                    {session.user.email}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="p-2">
-
+            <div className="p-2 space-y-1 bg-white/40">
               <button
                 disabled={isSigningOut}
                 onClick={async () => {
@@ -88,16 +108,21 @@ export function UserMenu({ session }: UserMenuProps) {
                     setIsSigningOut(false);
                   }
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left group disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50/80 rounded-2xl transition-all duration-200 text-left group disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-sm"
               >
-                {isSigningOut ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                )}
-                <span className="font-medium">
-                  {isSigningOut ? "Signing Out" : "Sign Out"}
-                </span>
+                <div className="p-2 bg-red-100/50 rounded-xl group-hover:bg-red-100 transition-colors">
+                  {isSigningOut ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <LogOut className="w-4 h-4" />
+                  )}
+                </div>
+                <div className="flex flex-col items-start">
+                    <span className="font-semibold text-gray-900 group-hover:text-red-700 transition-colors">
+                    {isSigningOut ? "Signing Out..." : "Sign Out"}
+                    </span>
+                    <span className="text-xs text-gray-500 font-medium">Log out of your account</span>
+                </div>
               </button>
             </div>
           </motion.div>
