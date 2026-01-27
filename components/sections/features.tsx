@@ -89,15 +89,7 @@ function FeatureSection({ feature, index, onClick }: FeatureSectionProps) {
     >
       {/* Text Content */}
       <div className="flex-1 space-y-8 text-center md:text-left">
-        <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black text-white mb-2 shadow-xl"
-        >
-            <feature.icon className="w-8 h-8" />
-        </motion.div>
+       
         
         <h2 className="text-4xl md:text-6xl font-black font-oswald uppercase tracking-tight leading-none">
           {feature.title}
