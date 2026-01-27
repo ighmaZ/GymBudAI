@@ -141,7 +141,7 @@ export function Navbar({ className }: NavbarProps) {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={cn(
-              "p-2 transition-colors duration-300",
+              "p-2 -mr-2 transition-colors duration-300",
               isScrolled ? "text-black" : "text-white"
             )}
           >
@@ -180,7 +180,7 @@ export function Navbar({ className }: NavbarProps) {
                 ))}
               </div>
               
-              <div className="mt-auto mb-8">
+              <div className="mt-auto mb-24">
                 {isPending ? (
                   <div className="w-full h-12 bg-gray-800 rounded-lg animate-pulse" />
                 ) : session?.user ? (
