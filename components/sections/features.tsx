@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { FEATURES } from "@/constants";
 import { useSession } from "@/lib/auth-client";
@@ -73,42 +73,84 @@ function FeatureSection({ feature, index, onAuthClick }: FeatureSectionProps) {
     offset: ["start end", "end start"],
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.2], [100, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
+  const textY = useTransform(scrollYProgress, [0, 1], [0, -20]);
+
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
+
+  const imageVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.9, rotate: isEven ? -2 : 2 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
+
+  const decorVariants: Variants = {
+    hidden: { opacity: 0, x: isEven ? -20 : 20 },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: { duration: 1, delay: 0.4, ease: "easeOut" }
+    }
+  };
 
   return (
     <motion.div
       ref={ref}
-      style={{ opacity, y }}
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-20%" }}
       className={cn(
         "flex flex-col md:flex-row items-center gap-12 md:gap-24",
         !isEven && "md:flex-row-reverse"
       )}
     >
       {/* Text Content */}
-      <div className="flex-1 space-y-8 text-center md:text-left">
-       
-        
-        <h2 className="text-4xl md:text-6xl font-black font-oswald uppercase tracking-tight leading-none">
+      <motion.div style={{ y: textY }} className="flex-1 space-y-8 text-center md:text-left">
+        <motion.h2 variants={itemVariants} className="text-4xl md:text-6xl font-black font-oswald uppercase tracking-tight leading-none">
           {feature.title}
-        </h2>
+        </motion.h2>
         
-        <p className="text-xl text-gray-600 max-w-lg mx-auto md:mx-0 leading-relaxed font-medium">
+        <motion.p variants={itemVariants} className="text-xl text-gray-600 max-w-lg mx-auto md:mx-0 leading-relaxed font-medium">
           {feature.description}
-        </p>
+        </motion.p>
         
-        <Link
-            href={feature.href || "/"}
-            onClick={onAuthClick}
-            className="group inline-flex items-center gap-2 text-lg font-bold border-b-2 border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition-colors"
-        >
-            Get Started
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </Link>
-      </div>
+        <motion.div variants={itemVariants}>
+            <Link
+                href={feature.href || "/"}
+                onClick={onAuthClick}
+                className="group inline-flex items-center gap-2 text-lg font-bold border-b-2 border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition-colors"
+            >
+                Get Started
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+        </motion.div>
+      </motion.div>
 
       {/* Visual / Image Display */}
-      <div className="flex-1 w-full relative group perspective-1000">
+      <motion.div variants={imageVariants} style={{ y }} className="flex-1 w-full relative group perspective-1000">
         <Link 
             href={feature.href || "/"}
             onClick={onAuthClick}
@@ -153,8 +195,8 @@ function FeatureSection({ feature, index, onAuthClick }: FeatureSectionProps) {
         </Link>
         
         {/* Decorative elements */}
-        <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full bg-gray-100 rounded-3xl" />
-      </div>
+        <motion.div variants={decorVariants} className="absolute -z-10 -bottom-6 -right-6 w-full h-full bg-gray-100 rounded-3xl" />
+      </motion.div>
     </motion.div>
   );
 }
