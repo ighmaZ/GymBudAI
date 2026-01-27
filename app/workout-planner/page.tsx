@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Save } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -123,78 +123,104 @@ export default function WorkoutPlannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white text-black font-sans selection:bg-black selection:text-white">
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
-        <div className="max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F5F5F7] text-black font-sans selection:bg-black selection:text-white relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-gray-200/40 to-transparent rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-gradient-to-tl from-gray-200/40 to-transparent rounded-full blur-[100px]" />
+      </div>
+
+      <header className="sticky top-0 z-50 bg-[#F5F5F7]/80 backdrop-blur-md border-b border-white/20">
+        <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href="/"
-            className="p-2 -ml-2 text-gray-500 hover:text-black hover:bg-gray-100/80 rounded-full transition-all"
+            className="p-2 -ml-2 text-gray-500 hover:text-black hover:bg-white/50 rounded-full transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-lg font-bold font-oswald uppercase tracking-wide bg-gradient-to-r from-black to-gray-700 bg-clip-text text-transparent">
-            Workout Plan
-          </h1>
+          <div className="flex flex-col items-center">
+             <h1 className="text-lg font-bold font-oswald uppercase tracking-wide bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent flex items-center gap-2">
+               Workout Planner
+             </h1>
+          </div>
           <div className="w-9" />
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto px-6 py-8 pb-32">
+      <main className="max-w-2xl mx-auto px-6 py-8 pb-32 relative z-10">
         <AnimatePresence mode="wait">
           {pageState === "planner" && (
             <motion.div
               key="planner"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="h-full"
+              className="h-full flex flex-col gap-6"
             >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="flex items-center justify-between mb-6"
+                className="flex items-center justify-between"
               >
-                <button
-                  onClick={handleGenerateAI}
-                  disabled={generateMutation.isPending}
-                  className="group flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-black hover:to-gray-900 text-gray-700 hover:text-white rounded-2xl transition-all duration-300 shadow-sm hover:shadow-lg"
-                >
-                  <span className="text-sm font-bold font-oswald uppercase tracking-wider">
-                    AI Generate
-                  </span>
-                </button>
-                <motion.button
-                  onClick={handleSave}
-                  disabled={!workoutNotes.trim() || saveMutation.isPending}
-                  className="group px-6 py-2.5 bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="text-sm font-bold font-oswald uppercase tracking-wider">
-                    {saveMutation.isPending ? "Saving..." : "Save"}
-                  </span>
-                </motion.button>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Weekly Plan</span>
+                   <h2 className="text-3xl font-black font-oswald uppercase tracking-tighter">My Routine</h2>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleGenerateAI}
+                    disabled={generateMutation.isPending}
+                    className="group flex items-center gap-2 px-4 py-3 bg-white hover:bg-black hover:text-white border border-gray-100 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-lg"
+                  >
+                    <span className="text-xs font-bold font-oswald uppercase tracking-wider">
+                      AI Build
+                    </span>
+                  </button>
+                  <motion.button
+                    onClick={handleSave}
+                    disabled={!workoutNotes.trim() || saveMutation.isPending}
+                    className="group flex items-center gap-2 px-5 py-3 bg-black text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Save className="w-4 h-4" />
+                    <span className="text-xs font-bold font-oswald uppercase tracking-wider">
+                      {saveMutation.isPending ? "..." : "Save"}
+                    </span>
+                  </motion.button>
+                </div>
               </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.4 }}
-                className="relative"
+                className="relative group"
               >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-black via-gray-600 to-black rounded-3xl opacity-20 blur-sm" />
-                <div className="relative bg-white rounded-3xl p-6 shadow-xl ring-1 ring-gray-200/50">
-                  <textarea
-                    value={workoutNotes}
-                    onChange={(e) => setWorkoutNotes(e.target.value)}
-                    placeholder="Start typing your workout plan...&#10;&#10;Monday - Push Day&#10;Bench press: 3 × 8&#10;Overhead press: 3 × 10&#10;Tricep dips: 3 × 12&#10;&#10;Tuesday - Pull Day&#10;Pull-ups: 4 × 8&#10;Rows: 3 × 12&#10;Face pulls: 3 × 15&#10;&#10;Wednesday - Rest&#10;Light walk or yoga"
-                    className="w-full h-[calc(100vh-320px)] px-0 py-0 bg-transparent outline-none text-base leading-relaxed resize-none placeholder:text-gray-300/70"
-                    autoFocus
-                    style={{ minHeight: "400px" }}
-                  />
-                </div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-[2rem] opacity-50 blur group-hover:opacity-75 transition-opacity duration-500" />
+                <div className="relative bg-white rounded-[1.75rem] p-1 shadow-xl ring-1 ring-black/5">
+                  <div className="bg-[#FDFDFD] rounded-3xl p-6 sm:p-8 min-h-[60vh] relative overflow-hidden">
+                    {/* Notebook lines effect */}
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+                         style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px)", backgroundSize: "100% 2.5rem", marginTop: "2.5rem" }}
+                    />
+                    
+                    <div className="relative z-10">
+
+
+                      </div>
+                      <textarea
+                        value={workoutNotes}
+                        onChange={(e) => setWorkoutNotes(e.target.value)}
+                        placeholder="Start typing your workout plan here...&#10;&#10;Example:&#10;Monday - Chest & Triceps&#10;• Bench Press: 3 sets x 8-10 reps&#10;• Incline Dumbbell Press: 3 sets x 10-12 reps&#10;..."
+                        className="w-full h-full min-h-[500px] bg-transparent outline-none text-base sm:text-lg leading-10 font-medium text-gray-700 placeholder:text-gray-300 resize-none font-mono"
+                      />
+                    </div>
+                  </div>
+
               </motion.div>
             </motion.div>
           )}
@@ -202,39 +228,32 @@ export default function WorkoutPlannerPage() {
           {pageState === "ai-form" && (
             <motion.div
               key="ai-form"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="space-y-8"
+              className="max-w-xl mx-auto"
             >
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center space-y-2 mb-10"
+                  className="text-center space-y-4 mb-10"
                 >
                   <motion.h2
                     className="text-4xl font-black font-oswald uppercase tracking-tighter text-black"
                   >
-                    WORKOUT PLANNER
+                    Design Your Plan
                   </motion.h2>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: "180px" }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
-                    className="h-1.5 bg-black rounded-full mx-auto my-4"
-                  />
-                  <motion.p
-                    className="text-gray-400 font-medium tracking-wide text-sm uppercase"
-                  >
-                    Customized Weekly Routine
-                  </motion.p>
+                  <p className="text-gray-500 font-medium tracking-wide text-sm max-w-xs mx-auto">
+                    Let AI build a scientifically optimized workout routine tailored to your goals.
+                  </p>
                 </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] shadow-xl ring-1 ring-white/50"
               >
                 <WorkoutForm
                   onSubmit={handleGenerate}
@@ -245,14 +264,15 @@ export default function WorkoutPlannerPage() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.4 }}
+                className="mt-6"
               >
                 <Button
                   variant="ghost"
                   onClick={() => setPageState("planner")}
-                  className="w-full h-12 text-gray-500 hover:text-black hover:bg-gray-50 font-bold font-oswald uppercase tracking-wider rounded-2xl"
+                  className="w-full text-gray-400 hover:text-black font-bold font-oswald uppercase tracking-wider text-xs"
                 >
-                  Cancel
+                  Cancel & Return
                 </Button>
               </motion.div>
             </motion.div>

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface WorkoutFormProps {
@@ -34,11 +33,14 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
     });
   };
 
+  const inputClasses = "w-full px-4 py-3 bg-white/50 backdrop-blur-sm hover:bg-white rounded-2xl border-2 border-transparent focus:border-black focus:bg-white outline-none transition-all duration-300 font-bold text-lg shadow-sm hover:shadow-md placeholder:font-normal placeholder:text-gray-300";
+  const labelClasses = "block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-4";
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-3 gap-3">
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-4">
+          <label className={labelClasses}>
             Age
           </label>
           <input
@@ -49,12 +51,12 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
             min="10"
             max="100"
             required
-            className="w-full px-4 py-3 bg-gray-50 hover:bg-white rounded-2xl border-2 border-transparent focus:border-black focus:bg-white outline-none transition-all duration-300 font-bold text-lg shadow-sm hover:shadow-md"
+            className={inputClasses}
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+        <div className="space-y-3">
+          <label className={labelClasses}>
             Weight (kg)
           </label>
           <input
@@ -65,12 +67,12 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
             min="30"
             max="300"
             required
-            className="w-full px-4 py-3 bg-gray-50 hover:bg-white rounded-2xl border-2 border-transparent focus:border-black focus:bg-white outline-none transition-all duration-300 font-bold text-lg shadow-sm hover:shadow-md"
+            className={inputClasses}
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+        <div className="space-y-3">
+          <label className={labelClasses}>
             Height (cm)
           </label>
           <input
@@ -81,20 +83,20 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
             min="100"
             max="250"
             required
-            className="w-full px-4 py-3 bg-gray-50 hover:bg-white rounded-2xl border-2 border-transparent focus:border-black focus:bg-white outline-none transition-all duration-300 font-bold text-lg shadow-sm hover:shadow-md"
+            className={inputClasses}
           />
         </div>
       </div>
 
       <div className="space-y-3">
-        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+        <label className={labelClasses}>
           Fitness Goal
         </label>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { value: "muscle_gain", label: "Muscle Gain", emoji: "💪" },
-            { value: "fat_loss", label: "Fat Loss", emoji: "🔥" },
-            { value: "endurance", label: "Endurance", emoji: "⚡" },
+            { value: "muscle_gain", label: "Muscle Gain", desc: "Build strength" },
+            { value: "fat_loss", label: "Fat Loss", desc: "Burn calories" },
+            { value: "endurance", label: "Endurance", desc: "Stamina" },
           ].map((option) => (
             <motion.button
               key={option.value}
@@ -102,23 +104,20 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
               onClick={() => setGoal(option.value)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`relative py-4 px-3 rounded-2xl font-bold text-sm uppercase tracking-wide transition-all duration-300 ${
+              className={`relative py-4 px-3 rounded-2xl text-left transition-all duration-300 border-2 overflow-hidden ${
                 goal === option.value
-                  ? "bg-gradient-to-br from-black to-gray-800 text-white shadow-xl"
-                  : "bg-gray-50 text-gray-600 hover:bg-gray-100 shadow-sm hover:shadow-md"
+                  ? "border-black bg-black text-white shadow-xl"
+                  : "border-transparent bg-white/50 text-gray-600 hover:bg-white hover:border-gray-100/50 shadow-sm"
               }`}
             >
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-lg">{option.emoji}</span>
-                <span>{option.label}</span>
+              <div className="relative z-10 flex flex-col items-center gap-1.5">
+                <span className="font-bold text-sm uppercase tracking-wide">{option.label}</span>
+                <span className={`text-[10px] font-medium tracking-wider uppercase ${goal === option.value ? "text-gray-400" : "text-gray-400"}`}>
+                  {option.desc}
+                </span>
               </div>
               {goal === option.value && (
-                <motion.div
-                  layoutId="selectedGoal"
-                  className="absolute inset-0 rounded-2xl bg-gradient-to-br from-black to-gray-800 -z-10"
-                  initial={false}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-20" />
               )}
             </motion.button>
           ))}
@@ -126,21 +125,21 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
       </div>
 
       <div className="space-y-3">
-        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+        <label className={labelClasses}>
           Days per Week
         </label>
-        <div className="flex gap-2 justify-between">
+        <div className="flex gap-2 justify-between bg-white/30 p-2 rounded-3xl">
           {["1", "2", "3", "4", "5", "6", "7"].map((days) => (
             <motion.button
               key={days}
               type="button"
               onClick={() => setFrequency(days)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`w-12 h-12 rounded-2xl font-bold text-base transition-all duration-300 ${
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold text-base transition-all duration-300 flex items-center justify-center ${
                 frequency === days
-                  ? "bg-gradient-to-br from-black to-gray-800 text-white shadow-xl"
-                  : "bg-gray-50 text-gray-600 hover:bg-gray-100 shadow-sm hover:shadow-md"
+                  ? "bg-black text-white shadow-lg ring-4 ring-black/10"
+                  : "bg-white text-gray-400 hover:text-black hover:bg-white hover:shadow-md"
               }`}
             >
               {days}
@@ -152,32 +151,31 @@ export function WorkoutForm({ onSubmit, isLoading }: WorkoutFormProps) {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
+        transition={{ delay: 0.4 }}
+        className="pt-4"
       >
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-16 bg-gradient-to-r from-black via-gray-800 to-black text-white hover:via-gray-900 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl transition-all duration-300 font-bold font-oswald uppercase tracking-wider text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-1"
+          className="relative w-full h-16 bg-black text-white overflow-hidden rounded-3xl group shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
         >
-          {isLoading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>Generate Plan</>
-          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-black to-gray-900 transition-opacity" />
+          <div className="relative flex items-center justify-center gap-3">
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <span className="font-bold font-oswald uppercase tracking-wider">Designing Plan...</span>
+              </>
+            ) : (
+              <>
+                <span className="font-bold font-oswald uppercase tracking-wider text-lg">Generate Workout</span>
+              </>
+            )}
+          </div>
         </Button>
       </motion.div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="text-center text-xs text-gray-400 font-medium"
-      >
-        AI will create a personalized plan based on your profile
-      </motion.p>
+            
     </form>
   );
 }
