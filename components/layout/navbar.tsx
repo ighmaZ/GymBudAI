@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { UserMenu } from "@/components/auth/user-menu";
 import { Menu, X, LogOut, Loader2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 
 interface NavbarProps {
@@ -84,13 +85,12 @@ export function Navbar({ className }: NavbarProps) {
           className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-wide"
         >
           {NAV_LINKS.map((link) => (
-            <button
+            <Link
               key={link.href}
+              href={link.href}
               onClick={(e) => {
-                e.preventDefault();
-                if (session?.user) {
-                  router.push(link.href);
-                } else {
+                if (!session?.user) {
+                  e.preventDefault();
                   setIsAuthModalOpen(true);
                 }
               }}
@@ -104,7 +104,7 @@ export function Navbar({ className }: NavbarProps) {
                 "absolute left-0 -bottom-1 h-[2px] w-0 transition-all duration-300 group-hover:w-full",
                 isScrolled ? "bg-black" : "bg-white"
               )} />
-            </button>
+            </Link>
           ))}
         </motion.div>
 
@@ -161,20 +161,22 @@ export function Navbar({ className }: NavbarProps) {
             >
               <div className="flex flex-col gap-4">
                 {NAV_LINKS.map((link) => (
-                  <button
+                  <Link
                     key={link.href}
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      if (session?.user) {
-                        router.push(link.href);
-                      } else {
+                    href={link.href}
+                    onClick={(e) => {
+                      if (!session?.user) {
+                        e.preventDefault();
+                        setIsMobileMenuOpen(false);
                         setIsAuthModalOpen(true);
+                      } else {
+                        setIsMobileMenuOpen(false);
                       }
                     }}
                     className="text-2xl font-oswald text-white text-left py-4 border-b border-white/10 hover:text-gray-300 transition-colors"
                   >
                     {link.label}
-                  </button>
+                  </Link>
                 ))}
               </div>
               

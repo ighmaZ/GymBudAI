@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { FEATURES } from "@/constants";
 import { useSession } from "@/lib/auth-client";
 import { AuthModal } from "@/components/auth/auth-modal";
-import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface FeaturesProps {
   className?: string;
@@ -18,18 +18,16 @@ export function Features({ className }: FeaturesProps) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { data: session, isPending } = useSession();
   const isLoggedIn = !!session?.user;
-  const router = useRouter();
 
-  const handleFeatureClick = (href?: string) => {
-    if (isPending) return;
-    
-    if (!isLoggedIn) {
-      setIsAuthModalOpen(true);
+  const handleAuthClick = (e: React.MouseEvent) => {
+    if (isPending) {
+      e.preventDefault();
       return;
     }
-
-    if (href) {
-      router.push(href);
+    
+    if (!isLoggedIn) {
+      e.preventDefault();
+      setIsAuthModalOpen(true);
     }
   };
 
@@ -47,7 +45,7 @@ export function Features({ className }: FeaturesProps) {
                 key={feature.title}
                 feature={feature}
                 index={index}
-                onClick={() => handleFeatureClick(feature.href)}
+                onAuthClick={handleAuthClick}
             />
             ))}
         </div>
@@ -64,10 +62,10 @@ export function Features({ className }: FeaturesProps) {
 interface FeatureSectionProps {
   feature: (typeof FEATURES)[number];
   index: number;
-  onClick: () => void;
+  onAuthClick: (e: React.MouseEvent) => void;
 }
 
-function FeatureSection({ feature, index, onClick }: FeatureSectionProps) {
+function FeatureSection({ feature, index, onAuthClick }: FeatureSectionProps) {
   const isEven = index % 2 === 0;
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -99,20 +97,22 @@ function FeatureSection({ feature, index, onClick }: FeatureSectionProps) {
           {feature.description}
         </p>
         
-        <button
-            onClick={onClick}
+        <Link
+            href={feature.href || "/"}
+            onClick={onAuthClick}
             className="group inline-flex items-center gap-2 text-lg font-bold border-b-2 border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition-colors"
         >
             Get Started
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </button>
+        </Link>
       </div>
 
       {/* Visual / Image Display */}
       <div className="flex-1 w-full relative group perspective-1000">
-        <div 
-            onClick={onClick}
-            className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl cursor-pointer transform transition-transform duration-700 hover:scale-[1.02] hover:-rotate-1"
+        <Link 
+            href={feature.href || "/"}
+            onClick={onAuthClick}
+            className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl cursor-pointer transform transition-transform duration-700 hover:scale-[1.02] hover:-rotate-1 block"
         >
             <div className="absolute inset-0 bg-gray-200 animate-pulse" /> {/* Placeholder while loading */}
             
@@ -150,7 +150,7 @@ function FeatureSection({ feature, index, onClick }: FeatureSectionProps) {
             
             {/* Overlay Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        </div>
+        </Link>
         
         {/* Decorative elements */}
         <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full bg-gray-100 rounded-3xl" />
