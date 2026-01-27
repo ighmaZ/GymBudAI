@@ -69,7 +69,7 @@ export function Navbar({ className }: NavbarProps) {
            animate="visible"
            transition={transitions.default}
            className={cn(
-             "text-2xl font-bold font-oswald tracking-tighter uppercase relative z-50 transition-colors duration-300",
+             "text-4xl font-bold font-oswald tracking-tighter uppercase relative z-50 transition-colors duration-300",
              isScrolled ? "text-black" : "text-white"
            )}
          >
