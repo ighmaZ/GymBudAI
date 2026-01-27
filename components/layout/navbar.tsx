@@ -29,7 +29,9 @@ export function Navbar({ className }: NavbarProps) {
   useEffect(() => {
     const handleScroll = () => {
       // Change navbar styling when scrolled past hero section (approximately)
-      setIsScrolled(window.scrollY > window.innerHeight * 0.7);
+      // Change navbar styling when entering Features section (ScrollyTelling is 400vh)
+      // Trigger almost at the end of the scrolly-telling (3.9 screens down)
+      setIsScrolled(window.scrollY > window.innerHeight * 3.9);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -65,7 +67,10 @@ export function Navbar({ className }: NavbarProps) {
            initial="hidden"
            animate="visible"
            transition={transitions.default}
-           className="text-2xl font-bold font-oswald tracking-tighter uppercase relative z-50 text-white"
+           className={cn(
+             "text-2xl font-bold font-oswald tracking-tighter uppercase relative z-50 transition-colors duration-300",
+             isScrolled ? "text-black" : "text-white"
+           )}
          >
            {SITE_CONFIG.name}
         </motion.div>
@@ -89,10 +94,16 @@ export function Navbar({ className }: NavbarProps) {
                   setIsAuthModalOpen(true);
                 }
               }}
-              className="group relative hover:text-gray-300 transition-colors cursor-pointer text-white"
+              className={cn(
+                "group relative transition-colors duration-300 cursor-pointer",
+                isScrolled ? "text-black hover:text-gray-700" : "text-white hover:text-gray-300"
+              )}
             >
               {link.label}
-              <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-white transition-all duration-300 group-hover:w-full" />
+              <span className={cn(
+                "absolute left-0 -bottom-1 h-[2px] w-0 transition-all duration-300 group-hover:w-full",
+                isScrolled ? "bg-black" : "bg-white"
+              )} />
             </button>
           ))}
         </motion.div>
