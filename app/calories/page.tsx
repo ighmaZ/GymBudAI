@@ -393,13 +393,13 @@ export default function CaloriesPage() {
         >
           <Button
             size="lg"
-            className="h-16 px-8 rounded-full shadow-2xl shadow-black/20 bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all duration-300 border-4 border-white flex items-center gap-3"
+            className="h-14 md:h-16 px-6 md:px-8 rounded-full shadow-2xl shadow-black/20 bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all duration-300 border-4 border-white flex items-center gap-3"
             onClick={() => setShowUpload(true)}
           >
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
               <Camera className="w-4 h-4" />
             </div>
-            <span className="font-bold font-oswald uppercase tracking-wider text-lg">
+            <span className="font-bold font-oswald uppercase tracking-wider text-base md:text-lg whitespace-nowrap">
               Snap Meal
             </span>
           </Button>
