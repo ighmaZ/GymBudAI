@@ -39,7 +39,7 @@ export function Features({ className }: FeaturesProps) {
           className
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col gap-40">
+        <div className="max-w-7xl mx-auto px-8 md:px-12 flex flex-col gap-40">
             {FEATURES.map((feature, index) => (
             <FeatureSection
                 key={feature.title}
@@ -195,7 +195,7 @@ function FeatureSection({ feature, index, onAuthClick }: FeatureSectionProps) {
         </Link>
         
         {/* Decorative elements */}
-        <motion.div variants={decorVariants} className="absolute -z-10 -bottom-6 -right-6 w-full h-full bg-gray-100 rounded-3xl" />
+        <motion.div variants={decorVariants} className="absolute -z-10 -bottom-3 -right-3 md:-bottom-6 md:-right-6 w-full h-full bg-gray-100 rounded-3xl" />
       </motion.div>
     </motion.div>
   );
