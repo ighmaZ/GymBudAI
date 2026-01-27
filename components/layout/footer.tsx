@@ -24,7 +24,7 @@ export function Footer() {
 
         <div className="flex items-center gap-2 text-sm font-light tracking-wide font-oswald uppercase order-1 md:order-2">
           <span className="text-zinc-400">Made with</span>
-          <Heart className="w-3.5 h-3.5 text-zinc-200 fill-zinc-200" />
+          <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
           <span className="text-zinc-400">by</span>
           <Link
             href="https://x.com/ighmaz_js"
