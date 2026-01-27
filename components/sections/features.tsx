@@ -115,13 +115,38 @@ function FeatureSection({ feature, index, onClick }: FeatureSectionProps) {
             className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl cursor-pointer transform transition-transform duration-700 hover:scale-[1.02] hover:-rotate-1"
         >
             <div className="absolute inset-0 bg-gray-200 animate-pulse" /> {/* Placeholder while loading */}
-            <Image
+            
+            {/* Video for desktop, Image for mobile - only when video exists */}
+            {feature.video ? (
+              <>
+                {/* Mobile: Image */}
+                <Image
+                  src={feature.image}
+                  alt={feature.title}
+                  fill
+                  className="object-cover md:hidden"
+                  sizes="100vw"
+                />
+                {/* Desktop: Looping Video */}
+                <video
+                  src={feature.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="none"
+                  className="hidden md:block object-cover w-full h-full absolute inset-0"
+                />
+              </>
+            ) : (
+              <Image
                 src={feature.image}
                 alt={feature.title}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
-            />
+              />
+            )}
             
             {/* Overlay Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
