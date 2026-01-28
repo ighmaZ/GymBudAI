@@ -1,6 +1,5 @@
 <div align="center">
 
-![GYMBUD AI Banner](https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop)
 
 # 🏋️ GYMBUD AI
 
@@ -9,7 +8,7 @@
 
 An intelligent fitness companion that leverages cutting-edge AI technology to help you track nutrition, perfect your exercise form, and create personalized workout plans.
 
-[Live Demo](https://gymbudai.vercel.app) · [Report Bug](https://github.com/yourusername/gymbudai/issues) · [Request Feature](https://github.com/yourusername/gymbudai/issues)
+[Live Demo](https://gymbudai.online) · [Report Bug](https://github.com/yourusername/gymbudai/issues) · [Request Feature](https://github.com/yourusername/gymbudai/issues)
 
 </div>
 
