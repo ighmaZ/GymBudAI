@@ -55,98 +55,100 @@ export function Navbar({ className }: NavbarProps) {
     <>
       <nav
         className={cn(
-          "fixed top-0 left-0 right-0 z-50",
-          "flex items-center justify-between",
-          "px-6 py-4 md:py-6 md:px-12 max-w-7xl mx-auto w-full",
-          "bg-transparent",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          isScrolled
+            ? "bg-white/80 backdrop-blur-md border-b border-black/5 supports-[backdrop-filter]:bg-white/50"
+            : "bg-transparent",
           className
         )}
       >
-        {/* Logo */}
-        <motion.div
-           variants={fadeInLeft}
-           initial="hidden"
-           animate="visible"
-           transition={transitions.default}
-           className={cn(
-             "text-4xl font-bold font-oswald tracking-tighter uppercase relative z-50 transition-colors duration-300",
-             isScrolled ? "text-black" : "text-white"
-           )}
-         >
-           {SITE_CONFIG.name}
-        </motion.div>
-
-        {/* Desktop Nav Links */}
-        <motion.div
-          variants={fadeInDown}
-          initial="hidden"
-          animate="visible"
-          transition={{ ...transitions.default, delay: 0.2 }}
-          className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-wide"
-        >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={(e) => {
-                if (!session?.user) {
-                  e.preventDefault();
-                  setIsAuthModalOpen(true);
-                }
-              }}
-              className={cn(
-                "group relative transition-colors duration-300 cursor-pointer",
-                isScrolled ? "text-black hover:text-gray-700" : "text-white hover:text-gray-300"
-              )}
-            >
-              {link.label}
-              <span className={cn(
-                "absolute left-0 -bottom-1 h-[2px] w-0 transition-all duration-300 group-hover:w-full",
-                isScrolled ? "bg-black" : "bg-white"
-              )} />
-            </Link>
-          ))}
-        </motion.div>
-
-        {/* Desktop CTA Button / User Menu */}
-        <motion.div
-          variants={fadeInRight}
-          initial="hidden"
-          animate="visible"
-          transition={transitions.default}
-          className="hidden md:flex items-center gap-4"
-        >
-          {isPending ? (
-            <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
-          ) : session?.user ? (
-            <UserMenu session={session} />
-          ) : (
-            <Button
-              className={cn(
-                "border-2 transition-colors duration-300",
-                isScrolled
-                  ? "bg-black text-white hover:bg-gray-800 border-white"
-                  : "bg-white text-black hover:bg-gray-200 border-white"
-              )}
-              size="md"
-              onClick={() => setIsAuthModalOpen(true)}
-            >
-              Login
-            </Button>
-          )}
-        </motion.div>
-
-        {/* Mobile Menu Toggle */}
-        <div className="md:hidden z-50">
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={cn(
-              "p-2 -mr-2 transition-colors duration-300",
-              isScrolled ? "text-black" : "text-white"
-            )}
+        <div className="flex items-center justify-between px-6 py-4 md:py-6 md:px-12 max-w-7xl mx-auto w-full">
+          {/* Logo */}
+          <motion.div
+             variants={fadeInLeft}
+             initial="hidden"
+             animate="visible"
+             transition={transitions.default}
+             className={cn(
+               "text-4xl font-bold font-oswald tracking-tighter uppercase relative z-50 transition-colors duration-300",
+               isScrolled ? "text-black" : "text-white"
+             )}
+           >
+             {SITE_CONFIG.name}
+          </motion.div>
+  
+          {/* Desktop Nav Links */}
+          <motion.div
+            variants={fadeInDown}
+            initial="hidden"
+            animate="visible"
+            transition={{ ...transitions.default, delay: 0.2 }}
+            className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-wide"
           >
-            {isMobileMenuOpen ? <X size={40} /> : <Menu size={40} />}
-          </button>
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={(e) => {
+                  if (!session?.user) {
+                    e.preventDefault();
+                    setIsAuthModalOpen(true);
+                  }
+                }}
+                className={cn(
+                  "group relative transition-colors duration-300 cursor-pointer",
+                  isScrolled ? "text-black hover:text-gray-700" : "text-white hover:text-gray-300"
+                )}
+              >
+                {link.label}
+                <span className={cn(
+                  "absolute left-0 -bottom-1 h-[2px] w-0 transition-all duration-300 group-hover:w-full",
+                  isScrolled ? "bg-black" : "bg-white"
+                )} />
+              </Link>
+            ))}
+          </motion.div>
+  
+          {/* Desktop CTA Button / User Menu */}
+          <motion.div
+            variants={fadeInRight}
+            initial="hidden"
+            animate="visible"
+            transition={transitions.default}
+            className="hidden md:flex items-center gap-4"
+          >
+            {isPending ? (
+              <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+            ) : session?.user ? (
+              <UserMenu session={session} />
+            ) : (
+              <Button
+                className={cn(
+                  "border-2 transition-colors duration-300",
+                  isScrolled
+                    ? "bg-black text-white hover:bg-gray-800 border-white"
+                    : "bg-white text-black hover:bg-gray-200 border-white"
+                )}
+                size="md"
+                onClick={() => setIsAuthModalOpen(true)}
+              >
+                Login
+              </Button>
+            )}
+          </motion.div>
+  
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden z-50">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className={cn(
+                "p-2 -mr-2 transition-colors duration-300",
+                isScrolled ? "text-black" : "text-white"
+              )}
+            >
+              {isMobileMenuOpen ? <X size={40} /> : <Menu size={40} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu Overlay */}

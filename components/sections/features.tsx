@@ -34,6 +34,7 @@ export function Features({ className }: FeaturesProps) {
   return (
     <>
       <section
+        id="features"
         className={cn(
           "w-full bg-white text-black py-32 rounded-t-[3rem] -mt-10 relative z-10",
           className
