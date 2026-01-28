@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
 
-    // 3. Call OpenAI to analyze the food
+    // 3. Call AI to analyze the food
     const result = await analyzeFoodImage(imageBase64);
 
     // 4. Return the result

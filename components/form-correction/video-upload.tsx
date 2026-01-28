@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
 import { Video, Upload, X, Play, Loader2, Square, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCamera } from "@/hooks/use-camera";
 
 interface VideoUploadProps {
   onVideoSelect: (videoBase64: string, mimeType: string) => void;
@@ -15,17 +16,37 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
-  const [isCameraMode, setIsCameraMode] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [cameraError, setCameraError] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const liveVideoRef = useRef<HTMLVideoElement>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const {
+    isCameraMode,
+    cameraError,
+    liveVideoRef,
+    mediaStreamRef,
+    startCamera,
+    stopCamera: stopCameraBase,
+  } = useCamera({
+    width: 1280,
+    height: 720,
+    audio: true,
+  });
+
+  // Extended stopCamera to also handle recording cleanup
+  const stopCamera = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setIsRecording(false);
+    setRecordingTime(0);
+    stopCameraBase();
+  }, [stopCameraBase]);
 
   const processFile = useCallback((file: File) => {
     const url = URL.createObjectURL(file);
@@ -44,73 +65,21 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
     },
   });
 
-  // Start camera stream
-  const startCamera = useCallback(async () => {
-    setCameraError(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: true,
-      });
-      
-      mediaStreamRef.current = stream;
-      setIsCameraMode(true);
-      
-      // Wait for the video element to be available
-      setTimeout(() => {
-        if (liveVideoRef.current) {
-          liveVideoRef.current.srcObject = stream;
-          liveVideoRef.current.play().catch(console.error);
-        }
-      }, 100);
-    } catch (error) {
-      console.error("Camera access error:", error);
-      setCameraError(
-        error instanceof Error && error.name === "NotAllowedError"
-          ? "Camera access denied. Please allow camera access in your browser settings."
-          : "Unable to access camera. Please make sure you have a camera connected."
-      );
-    }
-  }, []);
-
-  // Stop camera stream
-  const stopCamera = useCallback(() => {
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach(track => track.stop());
-      mediaStreamRef.current = null;
-    }
-    if (liveVideoRef.current) {
-      liveVideoRef.current.srcObject = null;
-    }
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    setIsCameraMode(false);
-    setIsRecording(false);
-    setRecordingTime(0);
-    setCameraError(null);
-  }, []);
-
   // Start recording
   const startRecording = useCallback(() => {
     if (!mediaStreamRef.current) return;
 
     recordedChunksRef.current = [];
-    
+
     // Try different mime types for browser compatibility
     const mimeTypes = [
-      'video/webm;codecs=vp9,opus',
-      'video/webm;codecs=vp8,opus',
-      'video/webm',
-      'video/mp4',
+      "video/webm;codecs=vp9,opus",
+      "video/webm;codecs=vp8,opus",
+      "video/webm",
+      "video/mp4",
     ];
-    
-    let selectedMimeType = '';
+
+    let selectedMimeType = "";
     for (const mimeType of mimeTypes) {
       if (MediaRecorder.isTypeSupported(mimeType)) {
         selectedMimeType = mimeType;
@@ -131,10 +100,10 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
 
       mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunksRef.current, {
-          type: selectedMimeType || 'video/webm',
+          type: selectedMimeType || "video/webm",
         });
-        const file = new File([blob], 'recorded-video.webm', {
-          type: selectedMimeType || 'video/webm',
+        const file = new File([blob], "recorded-video.webm", {
+          type: selectedMimeType || "video/webm",
         });
         processFile(file);
         stopCamera();
@@ -147,13 +116,12 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
 
       // Start timer
       timerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
     } catch (error) {
       console.error("Recording error:", error);
-      setCameraError("Unable to start recording. Please try again.");
     }
-  }, [processFile, stopCamera]);
+  }, [mediaStreamRef, processFile, stopCamera]);
 
   // Stop recording
   const stopRecording = useCallback(() => {
@@ -170,15 +138,17 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      stopCamera();
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
-  }, [stopCamera]);
+  }, []);
 
   // Format recording time
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const handleCameraClick = (e: React.MouseEvent) => {

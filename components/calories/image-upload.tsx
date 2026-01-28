@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Upload, X, Scan } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useCamera } from "@/hooks/use-camera";
 
 interface ImageUploadProps {
   onImageSelect: (base64: string) => void;
@@ -14,12 +15,19 @@ interface ImageUploadProps {
 
 export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
-  const [isCameraMode, setIsCameraMode] = useState(false);
-  const [cameraError, setCameraError] = useState<string | null>(null);
-  
-  const liveVideoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
+
+  const {
+    isCameraMode,
+    cameraError,
+    liveVideoRef,
+    startCamera,
+    stopCamera,
+  } = useCamera({
+    width: 1280,
+    height: 960,
+    audio: false,
+  });
 
   const processFile = useCallback(
     (file: File) => {
@@ -44,87 +52,34 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
     },
   });
 
-  // Start camera stream
-  const startCamera = useCallback(async () => {
-    setCameraError(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 960 },
-        },
-        audio: false,
-      });
-      
-      mediaStreamRef.current = stream;
-      setIsCameraMode(true);
-      
-      // Wait for the video element to be available
-      setTimeout(() => {
-        if (liveVideoRef.current) {
-          liveVideoRef.current.srcObject = stream;
-          liveVideoRef.current.play().catch(console.error);
-        }
-      }, 100);
-    } catch (error) {
-      console.error("Camera access error:", error);
-      setCameraError(
-        error instanceof Error && error.name === "NotAllowedError"
-          ? "Camera access denied. Please allow camera access in your browser settings."
-          : "Unable to access camera. Please make sure you have a camera connected."
-      );
-    }
-  }, []);
-
-  // Stop camera stream
-  const stopCamera = useCallback(() => {
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach(track => track.stop());
-      mediaStreamRef.current = null;
-    }
-    if (liveVideoRef.current) {
-      liveVideoRef.current.srcObject = null;
-    }
-    setIsCameraMode(false);
-    setCameraError(null);
-  }, []);
-
   // Take photo
   const takePhoto = useCallback(() => {
     if (!liveVideoRef.current || !canvasRef.current) return;
 
     const video = liveVideoRef.current;
     const canvas = canvasRef.current;
-    
+
     // Set canvas dimensions to match video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
     // Draw the current video frame to canvas
     const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
+
       // Get base64 data from canvas
       const base64 = canvas.toDataURL("image/jpeg", 0.9);
       setPreview(base64);
-      
+
       // Extract base64 data without prefix and send to parent
       const base64Data = base64.split(",")[1];
       onImageSelect(base64Data);
-      
+
       // Stop camera after taking photo
       stopCamera();
     }
-  }, [onImageSelect, stopCamera]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, [stopCamera]);
+  }, [liveVideoRef, onImageSelect, stopCamera]);
 
   const handleCameraClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -144,7 +99,7 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
     <div className="w-full">
       {/* Hidden canvas for photo capture */}
       <canvas ref={canvasRef} className="hidden" />
-      
+
       <AnimatePresence mode="wait">
         {/* Camera Mode */}
         {isCameraMode ? (
@@ -217,18 +172,18 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
               className="object-cover"
               unoptimized
             />
-            
+
             {/* Scanning Overlay */}
             {isLoading && (
               <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-10 backdrop-blur-sm">
-                <motion.div 
+                <motion.div
                   initial={{ height: "0%" }}
                   animate={{ height: "100%" }}
-                  transition={{ 
-                    duration: 2, 
+                  transition={{
+                    duration: 2,
                     repeat: Infinity,
                     repeatType: "reverse",
-                    ease: "linear"
+                    ease: "linear",
                   }}
                   className="absolute top-0 w-full bg-gradient-to-b from-transparent via-white/20 to-transparent pointer-events-none"
                 />
@@ -256,8 +211,8 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
             {...getRootProps()}
             className={cn(
               "group relative aspect-[4/3] rounded-[2.5rem] border-2 border-dashed transition-all duration-300 overflow-hidden",
-              isDragActive 
-                ? "border-black bg-gray-50 scale-[1.02]" 
+              isDragActive
+                ? "border-black bg-gray-50 scale-[1.02]"
                 : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50"
             )}
           >
@@ -274,7 +229,7 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
                 >
                   <Upload className="w-8 h-8 text-gray-900" />
                 </motion.button>
-                
+
                 <motion.button
                   type="button"
                   onClick={handleCameraClick}
