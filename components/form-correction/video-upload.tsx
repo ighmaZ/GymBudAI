@@ -17,6 +17,7 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   const [isConverting, setIsConverting] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback((file: File) => {
     const url = URL.createObjectURL(file);
@@ -24,11 +25,12 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
     setVideoFile(file);
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open: openFilePicker } = useDropzone({
     accept: {
       "video/*": [".mp4", ".mov", ".webm", ".avi"],
     },
     maxFiles: 1,
+    noClick: true, // Disable click on the dropzone itself
     onDrop: (files) => {
       if (files[0]) processFile(files[0]);
     },
@@ -37,6 +39,16 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) processFile(file);
+  };
+
+  const handleCameraClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    cameraInputRef.current?.click();
+  };
+
+  const handleUploadClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openFilePicker();
   };
 
   const handleAnalyze = useCallback(async () => {
@@ -152,31 +164,37 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
           >
             <input {...getInputProps()} />
 
+            {/* Hidden input for camera capture */}
             <input
-              ref={fileInputRef}
+              ref={cameraInputRef}
               type="file"
               accept="video/*"
+              capture="environment"
               onChange={handleFileChange}
               className="hidden"
             />
 
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
               <div className="flex gap-6 mb-8">
-                <motion.div
+                <motion.button
+                  type="button"
+                  onClick={handleUploadClick}
                   whileHover={{ scale: 1.1, rotate: -5 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-20 h-20 bg-white rounded-3xl shadow-lg shadow-gray-200/50 flex items-center justify-center border border-gray-100"
+                  className="w-20 h-20 bg-white rounded-3xl shadow-lg shadow-gray-200/50 flex items-center justify-center border border-gray-100 cursor-pointer"
                 >
                   <Upload className="w-8 h-8 text-gray-900" />
-                </motion.div>
+                </motion.button>
 
-                <motion.div
+                <motion.button
+                  type="button"
+                  onClick={handleCameraClick}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-20 h-20 bg-black text-white rounded-3xl shadow-lg shadow-black/20 flex items-center justify-center"
+                  className="w-20 h-20 bg-black text-white rounded-3xl shadow-lg shadow-black/20 flex items-center justify-center cursor-pointer"
                 >
                   <Video className="w-8 h-8" />
-                </motion.div>
+                </motion.button>
               </div>
 
               <div className="text-center space-y-2">
