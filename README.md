@@ -3,10 +3,10 @@
 
 # 🏋️ GYMBUD AI
 
-**Achieve Your Fitness Goals with AI-Powered Guidance**
+**From Struggle to Strength: My Personal Fitness AI**
 
 
-An intelligent fitness companion that leverages cutting-edge AI technology to help you track nutrition, perfect your exercise form, and create personalized workout plans.
+I built GymBud AI because I personally struggled with staying consistent in my fitness journey. Counting calories always felt like a chore, and I was never sure if my form was correct during workouts, risking injury. I needed a smarter tool—one that could see what I eat and watch how I move. So, I combined my passion for coding with my fitness goals to create this AI companion.
 
 [Live Demo](https://gymbudai.online) · [Report Bug](https://github.com/ighmaZ/GymBudAI/issues) · [Request Feature](https://github.com/ighmaZ/GymBudAI/issues)
 
@@ -16,7 +16,7 @@ An intelligent fitness companion that leverages cutting-edge AI technology to he
 
 ## Table of Contents
 
-- [About](#-about)
+- [The Story](#-the-story)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
@@ -28,13 +28,15 @@ An intelligent fitness companion that leverages cutting-edge AI technology to he
 
 ---
 
-## About
+## The Story
 
-GYMBUD AI is a comprehensive fitness platform that combines multiple AI services to provide:
+I didn't just build this as a project; I built it as a solution to my own problems. I wanted to stop guessing if I was eating right or lifting correctly.
 
-- **Intelligent Nutrition Tracking**: Snap a photo of your meal and get instant calorie and macronutrient analysis
-- **Real-time Form Correction**: Upload exercise videos and receive AI-powered feedback on your technique
-- **Personalized Workout Planning**: Generate custom workout routines based on your fitness goals, schedule, and preferences
+GymBud AI is the result of that journey—a comprehensive platform that combines multiple AI services to provide the guidance I always wished I had:
+
+- **Intelligent Nutrition Tracking**: Snap a photo of your meal and get instant calorie and macronutrient analysis. No more manual entry.
+- **Real-time Form Correction**: Upload exercise videos and receive AI-powered feedback on your technique. It's like having a trainer in your pocket.
+- **Personalized Workout Planning**: Generate custom workout routines based on your fitness goals, schedule, and preferences.
 
 Built with modern web technologies and integrated with industry-leading AI models, GYMBUD AI delivers a seamless and responsive user experience across all devices.
 
@@ -90,6 +92,15 @@ Built with modern web technologies and integrated with industry-leading AI model
 
 - **Computer Vision**: Google Gemini AI
 - **Food Recognition**: Google Gemini AI
+
+### Validation & Testing
+
+- **Validation**: Zod
+- **Testing**: Playwright
+
+### Infrastructure
+
+- **Rate Limiting**: Upstash Redis
 
 
 
@@ -182,30 +193,32 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
 ```
 gymbudai/
-├── app/                          # Next.js app directory
-│   ├── calories/                 # Calorie tracking page
-│   ├── form-correction/          # Form correction page
-│   ├── workout-planner/          # Workout planner page
-│   ├── layout.tsx               # Root layout
-│   └── page.tsx                 # Home page
-├── components/                   # React components
-│   ├── calories/                # Calorie-related components
-│   ├── form-correction/         # Form correction components
-│   ├── workout-planner/         # Workout planner components
-│   └── ui/                      # Shared UI components
-├── lib/                          # Utility libraries
-│   ├── auth.ts                  # Authentication utilities
-│   ├── prisma.ts                # Prisma client
-│   ├── openai.ts                # OpenAI integration
-│   ├── gemini-*.ts              # Gemini AI integrations
-│   └── utils.ts                 # General utilities
-├── prisma/                       # Database schema
-│   └── schema.prisma            # Prisma schema
-├── stores/                       # Zustand stores
-├── types/                        # TypeScript type definitions
-├── constants/                    # App constants
-├── public/                       # Static assets
-└── [config files]               # Next.js, TypeScript, Tailwind configs
+├── .github/                  # GitHub Actions workflows
+├── app/                      # Next.js app directory
+│   ├── api/                 # API Routes
+│   ├── calories/            # Calorie tracking page
+│   ├── form-correction/     # Form correction page
+│   ├── workout-planner/     # Workout planner page
+│   ├── layout.tsx           # Root layout
+│   └── page.tsx             # Home page
+├── components/               # React components
+│   ├── calories/            # Calorie-related components
+│   ├── form-correction/     # Form correction components
+│   ├── workout-planner/     # Workout planner components
+│   └── ui/                  # Shared UI components
+├── hooks/                    # Custom React hooks
+│   └── use-camera.ts        # Camera logic hook
+├── lib/                      # Utility libraries
+│   ├── auth.ts              # Authentication utilities
+│   ├── prisma.ts            # Prisma client
+│   ├── gemini-*.ts          # Gemini AI integrations
+│   └── utils.ts             # General utilities
+├── prisma/                   # Database schema
+├── public/                   # Static assets
+├── stores/                   # Zustand stores
+├── tests/                    # Playwright E2E tests
+├── types/                    # TypeScript type definitions
+└── [config files]           # Next.js, TS, Tailwind, Playwright configs
 ```
 
 ---
