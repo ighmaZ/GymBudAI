@@ -256,7 +256,7 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
               accept="image/*"
               capture="environment"
               onChange={handleCameraCapture}
-              className="hidden"
+              className="absolute opacity-0 w-0 h-0"
             />
 
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
@@ -274,7 +274,6 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
                 <motion.button
                   type="button"
                   onClick={handleCameraClick}
-                  onTouchEnd={handleCameraClick}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-20 h-20 bg-black text-white rounded-3xl shadow-lg shadow-black/20 flex items-center justify-center cursor-pointer hover:bg-gray-900 transition-colors"
