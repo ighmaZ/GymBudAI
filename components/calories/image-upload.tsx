@@ -81,7 +81,8 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
     }
   }, [liveVideoRef, onImageSelect, stopCamera]);
 
-  const handleCameraClick = (e: React.MouseEvent) => {
+  const handleCameraClick = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     startCamera();
   };
@@ -233,9 +234,11 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
                 <motion.button
                   type="button"
                   onClick={handleCameraClick}
+                  onTouchEnd={handleCameraClick}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-20 h-20 bg-black text-white rounded-3xl shadow-lg shadow-black/20 flex items-center justify-center cursor-pointer hover:bg-gray-900 transition-colors"
+                  style={{ touchAction: 'manipulation' }}
                 >
                   <Camera className="w-8 h-8" />
                 </motion.button>

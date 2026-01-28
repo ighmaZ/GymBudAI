@@ -151,7 +151,8 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleCameraClick = (e: React.MouseEvent) => {
+  const handleCameraClick = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     startCamera();
   };
@@ -370,9 +371,11 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
                 <motion.button
                   type="button"
                   onClick={handleCameraClick}
+                  onTouchEnd={handleCameraClick}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-20 h-20 bg-black text-white rounded-3xl shadow-lg shadow-black/20 flex items-center justify-center cursor-pointer"
+                  style={{ touchAction: 'manipulation' }}
                 >
                   <Video className="w-8 h-8" />
                 </motion.button>

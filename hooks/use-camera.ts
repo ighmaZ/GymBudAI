@@ -50,6 +50,8 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
 
   const startCamera = useCallback(async () => {
     setCameraError(null);
+    setIsCameraMode(true); // Set camera mode first to render the video element
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -61,22 +63,46 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
       });
 
       mediaStreamRef.current = stream;
-      setIsCameraMode(true);
 
-      // Wait for the video element to be available
-      setTimeout(() => {
+      // Use requestAnimationFrame to wait for the video element to be rendered
+      // This is more reliable on mobile than setTimeout
+      const attachStream = () => {
         if (liveVideoRef.current) {
-          liveVideoRef.current.srcObject = stream;
-          liveVideoRef.current.play().catch(console.error);
+          const video = liveVideoRef.current;
+          video.srcObject = stream;
+          // Set attributes for mobile compatibility
+          video.setAttribute('playsinline', 'true');
+          video.setAttribute('webkit-playsinline', 'true');
+          video.muted = true;
+          video.play().catch((playError) => {
+            console.error("Video play error:", playError);
+          });
+        } else {
+          // Video element not yet available, try again on next frame
+          requestAnimationFrame(attachStream);
         }
-      }, 100);
+      };
+      
+      requestAnimationFrame(attachStream);
     } catch (error) {
       console.error("Camera access error:", error);
-      setCameraError(
-        error instanceof Error && error.name === "NotAllowedError"
-          ? "Camera access denied. Please allow camera access in your browser settings."
-          : "Unable to access camera. Please make sure you have a camera connected."
-      );
+      setIsCameraMode(false); // Reset on error
+      
+      let errorMessage = "Unable to access camera. Please make sure you have a camera connected.";
+      
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError") {
+          errorMessage = "Camera access denied. Please allow camera access in your browser settings.";
+        } else if (error.name === "NotFoundError") {
+          errorMessage = "No camera found. Please make sure you have a camera connected.";
+        } else if (error.name === "NotReadableError") {
+          errorMessage = "Camera is in use by another application. Please close other apps using the camera.";
+        } else if (error.name === "OverconstrainedError") {
+          errorMessage = "Camera doesn't support the requested settings. Trying with default settings.";
+        }
+      }
+      
+      setCameraError(errorMessage);
     }
   }, [mergedOptions.facingMode, mergedOptions.width, mergedOptions.height, mergedOptions.audio]);
 
