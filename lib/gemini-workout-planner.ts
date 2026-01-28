@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { getRequiredEnv } from "./env";
+import { parseJsonFromAiResponse } from "./json-parser";
 
 const ai = new GoogleGenAI({
   vertexai: false,
@@ -116,17 +117,5 @@ export async function generateWorkoutPlan(
     throw new Error("No response from Gemini");
   }
 
-  let jsonString = text;
-  if (text.includes("```json")) {
-    jsonString = text.split("```json")[1].split("```")[0].trim();
-  } else if (text.includes("```")) {
-    jsonString = text.split("```")[1].split("```")[0].trim();
-  }
-
-  try {
-    return JSON.parse(jsonString) as WorkoutPlanResponse;
-  } catch {
-    console.error("Failed to parse Gemini response:", text);
-    throw new Error("Failed to parse workout plan response");
-  }
+  return parseJsonFromAiResponse<WorkoutPlanResponse>(text, "workout plan");
 }

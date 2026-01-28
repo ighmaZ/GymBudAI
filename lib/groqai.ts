@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { getRequiredEnv } from "./env";
+import { parseJsonFromAiResponse } from "./json-parser";
 
 // Initialize Groq
 const groq = new Groq({
@@ -97,18 +98,5 @@ Be conservative with calorie estimates - slightly overestimate for safety.`,
     throw new Error("No response from Groq");
   }
 
-  // Parse JSON from response (handle potential markdown code blocks)
-  let jsonString = content;
-  if (content.includes("```json")) {
-    jsonString = content.split("```json")[1].split("```")[0].trim();
-  } else if (content.includes("```")) {
-    jsonString = content.split("```")[1].split("```")[0].trim();
-  }
-
-  try {
-    return JSON.parse(jsonString) as FoodAnalysisResult;
-  } catch {
-    console.error("Failed to parse Groq response:", content);
-    throw new Error("Failed to parse food analysis response");
-  }
+  return parseJsonFromAiResponse<FoodAnalysisResult>(content, "food analysis");
 }

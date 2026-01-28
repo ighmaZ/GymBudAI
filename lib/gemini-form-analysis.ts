@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { FormAnalysisResult } from "@/types";
 import { getRequiredEnv } from "./env";
+import { parseJsonFromAiResponse } from "./json-parser";
 
 const ai = new GoogleGenAI({
   vertexai: false,
@@ -63,20 +64,7 @@ export async function analyzeFormWithGemini(
     throw new Error("No response from Gemini");
   }
 
-  // Parse JSON from response (handle potential markdown code blocks)
-  let jsonString = text;
-  if (text.includes("```json")) {
-    jsonString = text.split("```json")[1].split("```")[0].trim();
-  } else if (text.includes("```")) {
-    jsonString = text.split("```")[1].split("```")[0].trim();
-  }
-
-  try {
-    return JSON.parse(jsonString) as FormAnalysisResult;
-  } catch {
-    console.error("Failed to parse Gemini response:", text);
-    throw new Error("Failed to parse form analysis response");
-  }
+  return parseJsonFromAiResponse<FormAnalysisResult>(text, "form analysis");
 }
 
 
