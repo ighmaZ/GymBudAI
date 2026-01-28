@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
-import { Video, Upload, X, Play, Loader2 } from "lucide-react";
+import { Video, Upload, X, Play, Loader2, Square, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface VideoUploadProps {
@@ -15,9 +15,17 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
+  const [isCameraMode, setIsCameraMode] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
   const videoRef = useRef<HTMLVideoElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const liveVideoRef = useRef<HTMLVideoElement>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const processFile = useCallback((file: File) => {
     const url = URL.createObjectURL(file);
@@ -30,20 +38,152 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
       "video/*": [".mp4", ".mov", ".webm", ".avi"],
     },
     maxFiles: 1,
-    noClick: true, // Disable click on the dropzone itself
+    noClick: true,
     onDrop: (files) => {
       if (files[0]) processFile(files[0]);
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
+  // Start camera stream
+  const startCamera = useCallback(async () => {
+    setCameraError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: true,
+      });
+      
+      mediaStreamRef.current = stream;
+      setIsCameraMode(true);
+      
+      // Wait for the video element to be available
+      setTimeout(() => {
+        if (liveVideoRef.current) {
+          liveVideoRef.current.srcObject = stream;
+          liveVideoRef.current.play().catch(console.error);
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Camera access error:", error);
+      setCameraError(
+        error instanceof Error && error.name === "NotAllowedError"
+          ? "Camera access denied. Please allow camera access in your browser settings."
+          : "Unable to access camera. Please make sure you have a camera connected."
+      );
+    }
+  }, []);
+
+  // Stop camera stream
+  const stopCamera = useCallback(() => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+    if (liveVideoRef.current) {
+      liveVideoRef.current.srcObject = null;
+    }
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setIsCameraMode(false);
+    setIsRecording(false);
+    setRecordingTime(0);
+    setCameraError(null);
+  }, []);
+
+  // Start recording
+  const startRecording = useCallback(() => {
+    if (!mediaStreamRef.current) return;
+
+    recordedChunksRef.current = [];
+    
+    // Try different mime types for browser compatibility
+    const mimeTypes = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+      'video/mp4',
+    ];
+    
+    let selectedMimeType = '';
+    for (const mimeType of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(mimeType)) {
+        selectedMimeType = mimeType;
+        break;
+      }
+    }
+
+    try {
+      const mediaRecorder = new MediaRecorder(mediaStreamRef.current, {
+        mimeType: selectedMimeType || undefined,
+      });
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, {
+          type: selectedMimeType || 'video/webm',
+        });
+        const file = new File([blob], 'recorded-video.webm', {
+          type: selectedMimeType || 'video/webm',
+        });
+        processFile(file);
+        stopCamera();
+      };
+
+      mediaRecorder.start(1000); // Collect data every second
+      mediaRecorderRef.current = mediaRecorder;
+      setIsRecording(true);
+      setRecordingTime(0);
+
+      // Start timer
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+    } catch (error) {
+      console.error("Recording error:", error);
+      setCameraError("Unable to start recording. Please try again.");
+    }
+  }, [processFile, stopCamera]);
+
+  // Stop recording
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      setIsRecording(false);
+    }
+  }, [isRecording]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  // Format recording time
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const handleCameraClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    cameraInputRef.current?.click();
+    startCamera();
   };
 
   const handleUploadClick = (e: React.MouseEvent) => {
@@ -57,11 +197,9 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
     setIsConverting(true);
 
     try {
-      // Convert video file to base64
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        // Remove the data URL prefix (e.g., "data:video/mp4;base64,")
         const base64 = result.split(",")[1];
         const mimeType = videoFile.type || "video/mp4";
         onVideoSelect(base64, mimeType);
@@ -91,8 +229,90 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   return (
     <div className="w-full">
       <AnimatePresence mode="wait">
-        {preview ? (
+        {/* Camera Recording Mode */}
+        {isCameraMode ? (
           <motion.div
+            key="camera"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="space-y-4"
+          >
+            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-black/10 aspect-video bg-black">
+              <video
+                ref={liveVideoRef}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                playsInline
+              />
+
+              {/* Recording indicator */}
+              {isRecording && (
+                <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full">
+                  <motion.div
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="w-3 h-3 bg-white rounded-full"
+                  />
+                  <span className="font-bold font-oswald tracking-wider">
+                    REC {formatTime(recordingTime)}
+                  </span>
+                </div>
+              )}
+
+              {/* Close button */}
+              <button
+                onClick={stopCamera}
+                className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Camera error message */}
+              {cameraError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 p-6">
+                  <div className="text-center">
+                    <p className="text-red-400 font-medium mb-4">{cameraError}</p>
+                    <button
+                      onClick={stopCamera}
+                      className="px-6 py-2 bg-white text-black rounded-xl font-bold"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Recording controls */}
+            <div className="flex justify-center gap-4">
+              {!isRecording ? (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={startRecording}
+                  className="flex items-center gap-3 px-8 py-4 bg-red-600 text-white rounded-2xl font-bold font-oswald uppercase tracking-wider hover:bg-red-700 transition-colors"
+                >
+                  <Circle className="w-5 h-5 fill-white" />
+                  Start Recording
+                </motion.button>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={stopRecording}
+                  className="flex items-center gap-3 px-8 py-4 bg-black text-white rounded-2xl font-bold font-oswald uppercase tracking-wider hover:bg-gray-900 transition-colors"
+                >
+                  <Square className="w-5 h-5 fill-white" />
+                  Stop Recording
+                </motion.button>
+              )}
+            </div>
+          </motion.div>
+        ) : preview ? (
+          <motion.div
+            key="preview"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -154,6 +374,7 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
           </motion.div>
         ) : (
           <div
+            key="upload"
             {...getRootProps()}
             className={cn(
               "group relative aspect-video rounded-[2.5rem] border-2 border-dashed transition-all duration-300 overflow-hidden cursor-pointer",
@@ -163,16 +384,6 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
             )}
           >
             <input {...getInputProps()} />
-
-            {/* Hidden input for camera capture */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="video/*"
-              capture="environment"
-              onChange={handleFileChange}
-              className="hidden"
-            />
 
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
               <div className="flex gap-6 mb-8">
@@ -212,6 +423,3 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
     </div>
   );
 }
-
-
-

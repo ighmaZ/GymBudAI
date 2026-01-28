@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Upload, X, Image as ImageIcon, Scan } from "lucide-react";
+import { Camera, Upload, X, Scan } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -14,7 +14,12 @@ interface ImageUploadProps {
 
 export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCameraMode, setIsCameraMode] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  
+  const liveVideoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const processFile = useCallback(
     (file: File) => {
@@ -30,21 +35,105 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
     [onImageSelect]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open: openFilePicker } = useDropzone({
     accept: { "image/*": [] },
     maxFiles: 1,
+    noClick: true,
     onDrop: (files) => {
       if (files[0]) processFile(files[0]);
     },
   });
 
-  const handleCameraCapture = () => {
-    fileInputRef.current?.click();
+  // Start camera stream
+  const startCamera = useCallback(async () => {
+    setCameraError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 960 },
+        },
+        audio: false,
+      });
+      
+      mediaStreamRef.current = stream;
+      setIsCameraMode(true);
+      
+      // Wait for the video element to be available
+      setTimeout(() => {
+        if (liveVideoRef.current) {
+          liveVideoRef.current.srcObject = stream;
+          liveVideoRef.current.play().catch(console.error);
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Camera access error:", error);
+      setCameraError(
+        error instanceof Error && error.name === "NotAllowedError"
+          ? "Camera access denied. Please allow camera access in your browser settings."
+          : "Unable to access camera. Please make sure you have a camera connected."
+      );
+    }
+  }, []);
+
+  // Stop camera stream
+  const stopCamera = useCallback(() => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+    if (liveVideoRef.current) {
+      liveVideoRef.current.srcObject = null;
+    }
+    setIsCameraMode(false);
+    setCameraError(null);
+  }, []);
+
+  // Take photo
+  const takePhoto = useCallback(() => {
+    if (!liveVideoRef.current || !canvasRef.current) return;
+
+    const video = liveVideoRef.current;
+    const canvas = canvasRef.current;
+    
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw the current video frame to canvas
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Get base64 data from canvas
+      const base64 = canvas.toDataURL("image/jpeg", 0.9);
+      setPreview(base64);
+      
+      // Extract base64 data without prefix and send to parent
+      const base64Data = base64.split(",")[1];
+      onImageSelect(base64Data);
+      
+      // Stop camera after taking photo
+      stopCamera();
+    }
+  }, [onImageSelect, stopCamera]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  const handleCameraClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    startCamera();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
+  const handleUploadClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openFilePicker();
   };
 
   const clearPreview = () => {
@@ -53,9 +142,69 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
 
   return (
     <div className="w-full">
+      {/* Hidden canvas for photo capture */}
+      <canvas ref={canvasRef} className="hidden" />
+      
       <AnimatePresence mode="wait">
-        {preview ? (
+        {/* Camera Mode */}
+        {isCameraMode ? (
           <motion.div
+            key="camera"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="space-y-4"
+          >
+            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-black/10 aspect-[4/3] bg-black">
+              <video
+                ref={liveVideoRef}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                playsInline
+              />
+
+              {/* Close button */}
+              <button
+                onClick={stopCamera}
+                className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Camera error message */}
+              {cameraError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 p-6">
+                  <div className="text-center">
+                    <p className="text-red-400 font-medium mb-4">{cameraError}</p>
+                    <button
+                      onClick={stopCamera}
+                      className="px-6 py-2 bg-white text-black rounded-xl font-bold"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Capture button */}
+            {!cameraError && (
+              <div className="flex justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={takePhoto}
+                  className="w-20 h-20 bg-white rounded-full shadow-lg shadow-black/20 flex items-center justify-center border-4 border-black cursor-pointer hover:bg-gray-100 transition-colors"
+                >
+                  <div className="w-14 h-14 bg-black rounded-full" />
+                </motion.button>
+              </div>
+            )}
+          </motion.div>
+        ) : preview ? (
+          <motion.div
+            key="preview"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -103,6 +252,7 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
           </motion.div>
         ) : (
           <div
+            key="upload"
             {...getRootProps()}
             className={cn(
               "group relative aspect-[4/3] rounded-[2.5rem] border-2 border-dashed transition-all duration-300 overflow-hidden",
@@ -112,33 +262,24 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
             )}
           >
             <input {...getInputProps()} />
-            
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              className="hidden"
-            />
 
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
               <div className="flex gap-6 mb-8">
-                <motion.div
+                <motion.button
+                  type="button"
+                  onClick={handleUploadClick}
                   whileHover={{ scale: 1.1, rotate: -5 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-20 h-20 bg-white rounded-3xl shadow-lg shadow-gray-200/50 flex items-center justify-center border border-gray-100 cursor-pointer"
                 >
                   <Upload className="w-8 h-8 text-gray-900" />
-                </motion.div>
+                </motion.button>
                 
                 <motion.button
+                  type="button"
+                  onClick={handleCameraClick}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCameraCapture();
-                  }}
                   className="w-20 h-20 bg-black text-white rounded-3xl shadow-lg shadow-black/20 flex items-center justify-center cursor-pointer hover:bg-gray-900 transition-colors"
                 >
                   <Camera className="w-8 h-8" />
