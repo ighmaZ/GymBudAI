@@ -1,8 +1,9 @@
 import Groq from "groq-sdk";
+import { getRequiredEnv } from "./env";
 
 // Initialize Groq
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: getRequiredEnv("GROQ_API_KEY"),
 });
 
 // Type for analyzed food item

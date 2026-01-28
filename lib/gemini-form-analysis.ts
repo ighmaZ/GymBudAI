@@ -1,9 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 import type { FormAnalysisResult } from "@/types";
+import { getRequiredEnv } from "./env";
 
 const ai = new GoogleGenAI({
   vertexai: false,
-  apiKey: process.env.GEMINI_API_KEY!,
+  apiKey: getRequiredEnv("GEMINI_API_KEY"),
 });
 
 const FORM_ANALYSIS_PROMPT = `You are an expert fitness coach analyzing an exercise video.

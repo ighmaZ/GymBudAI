@@ -1,8 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
+import { getRequiredEnv } from "./env";
 
 const ai = new GoogleGenAI({
   vertexai: false,
-  apiKey: process.env.GEMINI_API_KEY!,
+  apiKey: getRequiredEnv("GEMINI_API_KEY"),
 });
 
 const WORKOUT_PLANNING_PROMPT = `You are an expert fitness coach creating personalized weekly workout plans.

@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { nextCookies } from "better-auth/next-js";
+import { getRequiredEnv } from "./env";
 
 const appURL =
   process.env.BETTER_AUTH_URL ||
@@ -10,7 +11,7 @@ const appURL =
 
 export const auth = betterAuth({
   baseURL: appURL,
-  secret: process.env.BETTER_AUTH_SECRET!,
+  secret: getRequiredEnv("BETTER_AUTH_SECRET"),
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -19,8 +20,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: getRequiredEnv("GOOGLE_CLIENT_ID"),
+      clientSecret: getRequiredEnv("GOOGLE_CLIENT_SECRET"),
       redirectURI: `${appURL}/api/auth/callback/google`,
       accessType: "offline",
       prompt: "select_account consent",
