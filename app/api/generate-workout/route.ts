@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateWorkoutPlan, type WorkoutPlanRequest } from "@/lib/gemini-workout-planner";
+import { generateWorkoutPlan } from "@/lib/gemini-workout-planner";
 import { rateLimit } from "@/lib/rate-limiter";
+import { generateWorkoutSchema, parseBody } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   // Rate limit check (10 requests per minute for AI routes)
@@ -9,28 +10,17 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { age, weight, height, goal, frequency } = body as WorkoutPlanRequest;
-
-    if (!age || !weight || !height || !goal || !frequency) {
+    
+    // Validate request body with Zod
+    const validation = parseBody(generateWorkoutSchema, body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: validation.error },
         { status: 400 }
       );
     }
 
-    if (!["muscle_gain", "fat_loss", "endurance"].includes(goal)) {
-      return NextResponse.json(
-        { error: "Invalid goal. Must be muscle_gain, fat_loss, or endurance" },
-        { status: 400 }
-      );
-    }
-
-    if (frequency < 1 || frequency > 7) {
-      return NextResponse.json(
-        { error: "Invalid frequency. Must be between 1 and 7" },
-        { status: 400 }
-      );
-    }
+    const { age, weight, height, goal, frequency } = validation.data;
 
     const plan = await generateWorkoutPlan({
       age,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeFoodImage } from "@/lib/groqai";
 import { rateLimit } from "@/lib/rate-limiter";
+import { analyzeFoodSchema, parseBody } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   // Rate limit check (10 requests per minute for AI routes)
@@ -8,19 +9,19 @@ export async function POST(request: NextRequest) {
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
-    // 1. Get the image from request body
     const body = await request.json();
-    const { imageBase64 } = body;
-
-    // 2. Validate input
-    if (!imageBase64) {
-      return NextResponse.json({ error: "No image provided" }, { status: 400 });
+    
+    // Validate input with Zod
+    const validation = parseBody(analyzeFoodSchema, body);
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // 3. Call AI to analyze the food
+    const { imageBase64 } = validation.data;
+
+    // Call AI to analyze the food
     const result = await analyzeFoodImage(imageBase64);
 
-    // 4. Return the result
     return NextResponse.json(result);
   } catch (error) {
     console.error("Food analysis error:", error);
