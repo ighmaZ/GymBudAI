@@ -4,7 +4,7 @@ import { rateLimit } from "@/lib/rate-limiter";
 
 // GET - Fetch user settings (calorie goal)
 export async function GET(request: NextRequest) {
-  const rateLimitResponse = rateLimit(request, "CRUD");
+  const rateLimitResponse = await rateLimit(request, "CRUD");
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
 // PATCH - Update user calorie goal
 export async function PATCH(request: NextRequest) {
-  const rateLimitResponse = rateLimit(request, "CRUD");
+  const rateLimitResponse = await rateLimit(request, "CRUD");
   if (rateLimitResponse) return rateLimitResponse;
 
   try {

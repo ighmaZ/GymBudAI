@@ -5,7 +5,7 @@ import { analyzeFoodSchema, parseBody } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   // Rate limit check (10 requests per minute for AI routes)
-  const rateLimitResponse = rateLimit(request, "AI");
+  const rateLimitResponse = await rateLimit(request, "AI");
   if (rateLimitResponse) return rateLimitResponse;
 
   try {

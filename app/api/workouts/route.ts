@@ -5,7 +5,7 @@ import { rateLimit } from "@/lib/rate-limiter";
 
 export async function GET(request: NextRequest) {
   // Rate limit check (60 requests per minute for CRUD routes)
-  const rateLimitResponse = rateLimit(request, "CRUD");
+  const rateLimitResponse = await rateLimit(request, "CRUD");
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   // Rate limit check (60 requests per minute for CRUD routes)
-  const rateLimitResponse = rateLimit(request, "CRUD");
+  const rateLimitResponse = await rateLimit(request, "CRUD");
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
