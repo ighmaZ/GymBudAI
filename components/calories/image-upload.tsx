@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Upload, X, Scan } from "lucide-react";
@@ -13,9 +13,24 @@ interface ImageUploadProps {
   isLoading?: boolean;
 }
 
+// Detect if user is on a mobile device
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+};
+
 export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Detect mobile on mount
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+  }, []);
 
   const {
     isCameraMode,
@@ -84,7 +99,23 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
   const handleCameraClick = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    startCamera();
+    
+    // On mobile, use native camera input instead of getUserMedia
+    if (isMobile && cameraInputRef.current) {
+      cameraInputRef.current.click();
+    } else {
+      startCamera();
+    }
+  };
+
+  // Handle file from native camera input (mobile)
+  const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+    // Reset input so the same file can be selected again
+    e.target.value = '';
   };
 
   const handleUploadClick = (e: React.MouseEvent) => {
@@ -218,6 +249,15 @@ export function ImageUpload({ onImageSelect, isLoading }: ImageUploadProps) {
             )}
           >
             <input {...getInputProps()} />
+            {/* Hidden input for mobile native camera capture */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleCameraCapture}
+              className="hidden"
+            />
 
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
               <div className="flex gap-6 mb-8">

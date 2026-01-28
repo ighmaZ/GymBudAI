@@ -12,17 +12,32 @@ interface VideoUploadProps {
   isLoading?: boolean;
 }
 
+// Detect if user is on a mobile device
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+};
+
 export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Detect mobile on mount
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+  }, []);
 
   const {
     isCameraMode,
@@ -154,7 +169,23 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
   const handleCameraClick = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    startCamera();
+    
+    // On mobile, use native camera input instead of getUserMedia
+    if (isMobile && cameraInputRef.current) {
+      cameraInputRef.current.click();
+    } else {
+      startCamera();
+    }
+  };
+
+  // Handle file from native camera input (mobile)
+  const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+    // Reset input so the same file can be selected again
+    e.target.value = '';
   };
 
   const handleUploadClick = (e: React.MouseEvent) => {
@@ -355,6 +386,15 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
             )}
           >
             <input {...getInputProps()} />
+            {/* Hidden input for mobile native camera capture */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="video/*"
+              capture="environment"
+              onChange={handleCameraCapture}
+              className="hidden"
+            />
 
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
               <div className="flex gap-6 mb-8">
