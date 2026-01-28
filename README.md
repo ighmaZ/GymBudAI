@@ -8,13 +8,13 @@
 
 An intelligent fitness companion that leverages cutting-edge AI technology to help you track nutrition, perfect your exercise form, and create personalized workout plans.
 
-[Live Demo](https://gymbudai.online) · [Report Bug](https://github.com/yourusername/gymbudai/issues) · [Request Feature](https://github.com/yourusername/gymbudai/issues)
+[Live Demo](https://gymbudai.online) · [Report Bug](https://github.com/ighmaZ/GymBudAI/issues) · [Request Feature](https://github.com/ighmaZ/GymBudAI/issues)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [About](#-about)
 - [Features](#-features)
@@ -28,7 +28,7 @@ An intelligent fitness companion that leverages cutting-edge AI technology to he
 
 ---
 
-## ✨ About
+## About
 
 GYMBUD AI is a comprehensive fitness platform that combines multiple AI services to provide:
 
@@ -107,8 +107,8 @@ Built with modern web technologies and integrated with industry-leading AI model
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/gymbudai.git
-cd gymbudai
+git clone https://github.com/ighmaZ/GymBudAI.git
+cd GymBudAI
 ```
 
 2. **Install dependencies**
@@ -119,7 +119,7 @@ yarn install
 
 3. **Set up environment variables**
 
-Create a `.env.local` file in the root directory and add the required variables (see [Environment Variables](#environment-variables)).
+Create a `.env.local` file in the root directory and add the required variables.
 
 4. **Set up the database**
 
@@ -153,7 +153,7 @@ yarn start
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 Create a `.env.local` file in the root directory with the following variables:
 
@@ -162,8 +162,8 @@ Create a `.env.local` file in the root directory with the following variables:
 DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
 
 # Authentication
-AUTH_SECRET="your-random-secret-key"
-AUTH_URL="http://localhost:3000"
+BETTER_AUTH_SECRET="your-random-secret-key"
+BETTER_AUTH_URL="http://localhost:3000"
 
 # AI Services
 GEMINI_API_KEY="your-gemini-api-key"
