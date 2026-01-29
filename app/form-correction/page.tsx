@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Eye } from "lucide-react";
+import { ArrowLeft, Eye, AlertCircle, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 
@@ -11,12 +11,13 @@ import { FormResults } from "@/components/form-correction/form-results";
 import { Button } from "@/components/ui/button";
 import type { FormAnalysisResult } from "@/types";
 
-type PageState = "upload" | "analyzing" | "results";
+type PageState = "upload" | "analyzing" | "results" | "error";
 
 export default function FormCorrectionPage() {
   const [pageState, setPageState] = useState<PageState>("upload");
   const [analysisResult, setAnalysisResult] =
     useState<FormAnalysisResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Mutation to send video to Gemini for analysis
   const analyzeMutation = useMutation({
@@ -40,12 +41,17 @@ export default function FormCorrectionPage() {
     },
     onSuccess: (data) => {
       setAnalysisResult(data);
+      setErrorMessage("");
       setPageState("results");
     },
     onError: (err) => {
       console.error("Analysis error:", err);
-      alert("Failed to analyze your form. Please try again.");
-      setPageState("upload");
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Failed to analyze your form. Please try again."
+      );
+      setPageState("error");
     },
   });
 
@@ -53,6 +59,7 @@ export default function FormCorrectionPage() {
   const handleVideoSelect = useCallback(
     (videoBase64: string, mimeType: string) => {
       setPageState("analyzing");
+      setErrorMessage("");
       analyzeMutation.mutate({ videoBase64, mimeType });
     },
     [analyzeMutation]
@@ -61,6 +68,7 @@ export default function FormCorrectionPage() {
   // Reset everything
   const handleAnalyzeAnother = () => {
     setAnalysisResult(null);
+    setErrorMessage("");
     setPageState("upload");
   };
 
@@ -73,6 +81,8 @@ export default function FormCorrectionPage() {
         return "Analyzing...";
       case "results":
         return "Your Results";
+      case "error":
+        return "Error";
       default:
         return "Form Correction";
     }
@@ -201,6 +211,56 @@ export default function FormCorrectionPage() {
                 result={analysisResult}
                 onAnalyzeAnother={handleAnalyzeAnother}
               />
+            </motion.div>
+          )}
+
+          {/* Error State */}
+          {pageState === "error" && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col flex-1 justify-start pt-8 pb-10"
+            >
+              <div className="flex flex-col items-center justify-center py-12">
+                {/* Error icon */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", damping: 15 }}
+                  className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-8 border-2 border-red-100"
+                >
+                  <AlertCircle className="w-12 h-12 text-red-500" />
+                </motion.div>
+
+                <h2 className="text-2xl font-bold font-oswald uppercase tracking-tight text-center mb-4">
+                  Unable to Analyze
+                </h2>
+                
+                <p className="text-gray-600 text-center max-w-sm mb-8 leading-relaxed">
+                  {errorMessage}
+                </p>
+
+                <div className="flex flex-col gap-3 w-full max-w-xs">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleAnalyzeAnother}
+                    className="w-full py-4 bg-black text-white rounded-2xl font-bold font-oswald uppercase tracking-wider flex items-center justify-center gap-3 hover:bg-gray-900 transition-colors"
+                  >
+                    <RotateCcw className="w-5 h-5" />
+                    Try Again
+                  </motion.button>
+                  
+                  <Link
+                    href="/"
+                    className="w-full py-4 bg-gray-100 text-gray-700 rounded-2xl font-bold font-oswald uppercase tracking-wider flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  >
+                    Back to Home
+                  </Link>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

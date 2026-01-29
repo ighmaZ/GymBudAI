@@ -32,6 +32,12 @@ IMPORTANT: Return ONLY valid JSON with this exact structure, no markdown or expl
   "improvementPoints": ["Specific issue 1", "Specific issue 2"],
   "tips": ["Actionable tip 1", "Actionable tip 2", "Actionable tip 3"],
   "overallGrade": "B"
+}
+
+If you cannot analyze the video (e.g., no exercise detected, subject is stationary, video is unclear, or no person visible), return this JSON instead:
+{
+  "error": true,
+  "reason": "Brief explanation of why analysis failed"
 }`;
 
 export async function analyzeFormWithGemini(
@@ -64,7 +70,49 @@ export async function analyzeFormWithGemini(
     throw new Error("No response from Gemini");
   }
 
-  return parseJsonFromAiResponse<FormAnalysisResult>(text, "form analysis");
+  // Check if Gemini returned an error response instead of analysis
+  // This happens when no exercise is detected, subject is stationary, etc.
+  const lowerText = text.toLowerCase();
+  if (
+    lowerText.includes("unable to analyze") ||
+    lowerText.includes("cannot analyze") ||
+    lowerText.includes("no exercise") ||
+    lowerText.includes("stationary") ||
+    lowerText.includes("not performing")
+  ) {
+    // Try to parse as error JSON first
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed.error && parsed.reason) {
+        throw new Error(parsed.reason);
+      }
+    } catch {
+      // Extract a user-friendly message from the response
+      throw new Error(
+        "No exercise detected in the video. Please record yourself performing an exercise and try again."
+      );
+    }
+  }
+
+  // Try to parse the response, with better error handling
+  try {
+    const result = parseJsonFromAiResponse<FormAnalysisResult & { error?: boolean; reason?: string }>(text, "form analysis");
+    
+    // Check if Gemini returned an error object
+    if (result.error && result.reason) {
+      throw new Error(result.reason);
+    }
+    
+    return result as FormAnalysisResult;
+  } catch (parseError) {
+    // If parsing failed, provide a more helpful error
+    if (parseError instanceof Error && parseError.message.includes("Failed to parse")) {
+      throw new Error(
+        "Could not analyze the video. Please ensure you're recording a clear exercise movement."
+      );
+    }
+    throw parseError;
+  }
 }
 
 
