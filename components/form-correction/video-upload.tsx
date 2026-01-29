@@ -202,8 +202,19 @@ export function VideoUpload({ onVideoSelect, isLoading }: VideoUploadProps) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        const base64 = result.split(",")[1];
-        const mimeType = videoFile.type || "video/mp4";
+        // Data URL format: "data:video/webm;codecs=vp9,opus;base64,XXXXX"
+        // The codec string can contain commas, so we can't just split by ","
+        // Instead, find the base64 marker and extract everything after it
+        const base64Marker = ";base64,";
+        const base64Index = result.indexOf(base64Marker);
+        const base64 = base64Index !== -1 
+          ? result.substring(base64Index + base64Marker.length)
+          : result.split(",")[1]; // Fallback for simpler data URLs
+        
+        // Strip codec parameters from MIME type (e.g., "video/webm;codecs=vp9,opus" -> "video/webm")
+        // Gemini API only accepts base MIME types without codec info
+        const rawMimeType = videoFile.type || "video/mp4";
+        const mimeType = rawMimeType.split(";")[0];
         onVideoSelect(base64, mimeType);
         setIsConverting(false);
       };
